@@ -1,50 +1,56 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LRState.hpp                                        :+:      :+:    :+:   */
+/*   LRTransition.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:54:51 by ldedier          ###   ########.fr       */
+/*   Created: 2019/11/28 08:34:45 by ldedier           #+#    #+#             */
+/*   Updated: 2019/11/28 15:14:52 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LRSTATE_HPP
-# define LRSTATE_HPP
+#ifndef LRTRANSITION_HPP
+# define LRTRANSITION_HPP
 
 # include <iostream>
-# include "LRTransition.hpp"
+# include "AbstractSymbol.hpp"
+# include "LRState.hpp"
 
 
 template<typename T, typename C>
-class LRState
+class LRState;
+
+template<typename T, typename C>
+class LRTransition
 {
 	public:
-		LRState(void)
+		LRTransition(void)
 		{
 			
 		}
-		LRState(LRState const &instance)
+
+		LRTransition(LRTransition<T, C> const &instance)
 		{
 			*this = instance;
 		}
 		
-		LRState<T, C> &operator=(LRState<T, C> const &rhs)
+		LRTransition<T, C> &operator=(LRTransition<T, C> const &rhs)
 		{
 			static_cast<void>(rhs);
 			return *this;
 		}
-
-		virtual ~LRState(void)
+		
+		virtual ~LRTransition(void)
 		{
 			
 		}
 
 	private:
-		std::vector<LRTransition<T, C> > _transitions;
+		AbstractSymbol<T, C>	&_symbol;
+		LRState<T, C>			&state;
 
 };
 
-// std::ostream &operator<<(std::ostream &o, LRState const &instance);
+// std::ostream &operator<<(std::ostream &o, LRTransition const &instance);
 #endif

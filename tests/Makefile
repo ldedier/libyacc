@@ -6,14 +6,13 @@
 #    By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/04/11 23:08:04 by ldedier           #+#    #+#              #
-#    Updated: 2019/11/28 09:51:35 by ldedier          ###   ########.fr        #
+#    Updated: 2019/11/28 15:13:42 by ldedier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	= libyacc
+NAME	= arithmetic
 
 CC		= g++
-AR		= ar rc
 
 ECHO = echo
 MKDIR = mkdir
@@ -26,32 +25,17 @@ OBJ_DIR			=	objs/
 BINDIR			=	./
 INCLUDESDIR		=	includes/
 
-INCLUDES		=	AbstractSymbol.hpp \
-					ASTNode.hpp \
-					AbstractGrammar.hpp \
-					AbstractLRAction.hpp \
-					AbstractNonTerminal.hpp \
-					AbstractSymbol.hpp \
-					AbstractToken.hpp \
-					LRActionAccept.hpp \
-					LRActionError.hpp \
-					LRActionReduce.hpp \
-					LRActionShift.hpp \
-					LRItem.hpp \
-					LRParser.hpp \
-					LRState.hpp \
-					LRTransition.hpp \
-					Production.hpp
+INCLUDES		=	ArithmeticGrammar.hpp 
 
-SRCS			=	
-
+SRCS			=	ArithmeticGrammar.cpp \
+					main.cpp
 
 VPATH			=	$(INCLUDESDIR) \
 					$(SRCDIR)
 
 OBJECTS			=	$(addprefix $(OBJ_DIR), $(SRCS:.cpp=.o))
 
-CFLAGS			= -I $(INCLUDESDIR) -Wall -Wextra -Werror
+CFLAGS			= -I $(INCLUDESDIR) -Wall -Wextra -Werror -I ../includes
 
 OK_COLOR	=	\x1b[32;01m
 EOC			=	\033[0m
@@ -69,7 +53,7 @@ debug:
 	@$(MAKE) all DEBUG=1
 
 $(BINDIR)$(NAME): $(OBJ_DIR) $(OBJECTS)
-	$(AR) $@ $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS)
 	@$(ECHO) "$(OK_COLOR)$(NAME) linked with success !$(EOC)"
 
 $(OBJ_DIR):

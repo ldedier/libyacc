@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:14:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 07:16:19 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/28 14:51:38 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,35 @@
 # include "AbstractSymbol.hpp"
 # include "Production.hpp"
 
-class AbstractToken : public AbstractSymbol
+template<typename T, typename C>
+class AbstractToken : public AbstractSymbol<T, C>
 {
 	public:
-		AbstractToken(void);
-		AbstractToken(AbstractToken const &instance);
-		AbstractToken &operator=(AbstractToken const &rhs);
-		~AbstractToken(void);
+		AbstractToken(void)
+		{
+			
+		}
+
+		AbstractToken(AbstractToken<T, C> const &instance)
+		{
+			*this = instance;
+		}
+
+		AbstractToken &operator=(AbstractToken<T, C> const &rhs)
+		{
+			static_cast<void>(rhs);
+			return *this;
+		}
+		
+		virtual ~AbstractToken(void)
+		{
+			
+		}
 
 	private:
-		std::vector<Production> _productions; 
+		std::vector<Production<T, C> > _productions; 
 
 };
 
-std::ostream &operator<<(std::ostream &o, AbstractToken const &instance);
+// std::ostream &operator<<(std::ostream &o, AbstractToken const &instance);
 #endif

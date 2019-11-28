@@ -1,50 +1,54 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LRState.hpp                                        :+:      :+:    :+:   */
+/*   EndOfInput.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:54:51 by ldedier          ###   ########.fr       */
+/*   Created: 2019/11/28 08:40:39 by ldedier           #+#    #+#             */
+/*   Updated: 2019/11/28 15:02:54 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LRSTATE_HPP
-# define LRSTATE_HPP
+#ifndef ENDOFINPUT_HPP
+# define ENDOFINPUT_HPP
 
 # include <iostream>
-# include "LRTransition.hpp"
-
+# include "AbstractToken.hpp"
 
 template<typename T, typename C>
-class LRState
+class EndOfInput : public AbstractToken<T, C>
 {
 	public:
-		LRState(void)
+		EndOfInput(void)
 		{
 			
 		}
-		LRState(LRState const &instance)
+		
+		EndOfInput(EndOfInput const &instance)
 		{
 			*this = instance;
 		}
-		
-		LRState<T, C> &operator=(LRState<T, C> const &rhs)
+		EndOfInput &operator=(EndOfInput const &rhs)
 		{
 			static_cast<void>(rhs);
 			return *this;
 		}
 
-		virtual ~LRState(void)
+		virtual T traverse(ASTNode<T, C>)
+		{
+			T t;
+			return t;		
+		}
+
+		virtual ~EndOfInput(void)
 		{
 			
 		}
 
 	private:
-		std::vector<LRTransition<T, C> > _transitions;
 
 };
 
-// std::ostream &operator<<(std::ostream &o, LRState const &instance);
+// std::ostream &operator<<(std::ostream &o, EndOfInput const &instance);
 #endif

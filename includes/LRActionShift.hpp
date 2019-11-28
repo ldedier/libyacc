@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:31:04 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 07:31:44 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/28 14:54:41 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,31 @@
 # include <iostream>
 # include "AbstractLRAction.hpp"
 
-class LRActionShift : public AbstractLRAction
+template<typename T, typename C>
+class LRActionShift : public AbstractLRAction<T, C>
 {
 	public:
-		LRActionShift(void);
-		LRActionShift(LRActionShift const &instance);
-		LRActionShift &operator=(LRActionShift const &rhs);
-		~LRActionShift(void);
+		LRActionShift(void)
+		{
+			
+		}
+		LRActionShift(LRActionShift const &instance)
+		{
+			*this = instance;
+		}
+		LRActionShift<T, C> &operator=(LRActionShift<T, C> const &rhs)
+		{
+			static_cast<void>(rhs);
+			return *this;
+		}
+		virtual ~LRActionShift(void)
+		{
+			
+		}
 
 	private:
 
 };
 
-std::ostream &operator<<(std::ostream &o, LRActionShift const &instance);
+// std::ostream &operator<<(std::ostream &o, LRActionShift const &instance);
 #endif

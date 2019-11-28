@@ -1,50 +1,50 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LRState.hpp                                        :+:      :+:    :+:   */
+/*   ASTBuilder.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:54:51 by ldedier          ###   ########.fr       */
+/*   Created: 2019/11/28 08:48:51 by ldedier           #+#    #+#             */
+/*   Updated: 2019/11/28 15:17:37 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LRSTATE_HPP
-# define LRSTATE_HPP
+#ifndef ASTBUILDER_HPP
+# define ASTBUILDER_HPP
 
 # include <iostream>
-# include "LRTransition.hpp"
-
+# include "ASTNode.hpp"
 
 template<typename T, typename C>
-class LRState
+class ASTBuilder
 {
 	public:
-		LRState(void)
+		ASTBuilder(void)
 		{
 			
 		}
-		LRState(LRState const &instance)
+
+		ASTBuilder(ASTBuilder const &instance)
 		{
 			*this = instance;
 		}
 		
-		LRState<T, C> &operator=(LRState<T, C> const &rhs)
+		ASTBuilder &operator=(ASTBuilder const &rhs)
 		{
 			static_cast<void>(rhs);
 			return *this;
 		}
-
-		virtual ~LRState(void)
+		
+		virtual ~ASTBuilder(void)
 		{
 			
 		}
 
 	private:
-		std::vector<LRTransition<T, C> > _transitions;
-
+		ASTNode<T, C> & _astRoot;
+		ASTNode<T, C> & _cstRoot;
 };
 
-// std::ostream &operator<<(std::ostream &o, LRState const &instance);
+// std::ostream &operator<<(std::ostream &o, ASTBuilder const &instance);
 #endif

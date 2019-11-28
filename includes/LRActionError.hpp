@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:29:09 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 07:29:49 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/28 14:53:53 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,34 @@
 # include <iostream>
 # include "AbstractLRAction.hpp"
 
-class LRActionError : public AbstractLRAction
+template<typename T, typename C>
+class LRActionError : public AbstractLRAction<T, C>
 {
 	public:
-		LRActionError(void);
-		LRActionError(LRActionError const &instance);
-		LRActionError &operator=(LRActionError const &rhs);
-		~LRActionError(void);
+		LRActionError(void)
+		{
+			
+		}
+
+		LRActionError(LRActionError const &instance)
+		{
+			*this = instance;
+		}
+
+		LRActionError &operator=(LRActionError const &rhs)
+		{
+			static_cast<void>(rhs);
+			return *this;
+		}
+		
+		virtual ~LRActionError(void)
+		{
+			
+		}
 
 	private:
 
 };
 
-std::ostream &operator<<(std::ostream &o, LRActionError const &instance);
+// std::ostream &operator<<(std::ostream &o, LRActionError const &instance);
 #endif
