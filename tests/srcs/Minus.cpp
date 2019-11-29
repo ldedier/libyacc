@@ -1,37 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LRItem.hpp                                         :+:      :+:    :+:   */
+/*   Minus.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 04:41:40 by ldedier          ###   ########.fr       */
+/*   Created: 2019/11/29 07:59:12 by ldedier           #+#    #+#             */
+/*   Updated: 2019/11/29 08:56:50 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LRITEM_HPP
-# define LRITEM_HPP
+#include "Minus.hpp"
 
-# include <iostream>
-# include "Production.hpp"
-# include "Production.hpp"
-
-class LRItem
+Minus::Minus(void) : AbstractToken("-")
 {
-	public:
-		LRItem(void);
-		LRItem(LRItem const &instance);
-		LRItem &operator=(LRItem const &rhs);
-		~LRItem(void);
+	
+}
 
-	private:
-		Production &production;
-		AbstractToken &Lookahead;
-		//progress
+Minus::~Minus(void)
+{
+	
+}
 
-
-};
-
-std::ostream &operator<<(std::ostream &o, LRItem const &instance);
-#endif
+int	Minus::traverse(ASTNode<int, int> & ast, int dummy) const
+{
+	(void)ast;
+	(void)dummy;
+	return 0;
+}

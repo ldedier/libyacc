@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 15:42:08 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 07:14:37 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,25 +45,36 @@ class AbstractGrammar
 			
 		}
 
-
 	protected:
 		AbstractNonTerminal<T, C> * _startSymbol;
-		std::vector<AbstractSymbol<T, C> > _symbols;
+		std::vector<AbstractSymbol<T, C> *> _symbols;
 		std::vector<AbstractNonTerminal<T, C> *> _nonTerminals;
 		std::vector<AbstractToken<T, C> *> _tokens;
 		
-		void addNonTerminal(AbstractNonTerminal<T, C> &nonTerminal)
+		void addNonTerminal(AbstractNonTerminal<T, C> * nonTerminal)
 		{
-			_nonTerminals.push_back(*nonTerminal);
-			_symbols.push_back(&nonTerminal);
+			_nonTerminals.push_back(nonTerminal);
+			_symbols.push_back(nonTerminal);
 		}
 		
-		void addToken(AbstractToken<T, C> &token)
+		void addToken(AbstractToken<T, C> *token)
 		{
-			_tokens.push_back(*token);
-			_symbols.push_back(&token);
+			_tokens.push_back(token);
+			_symbols.push_back(token);
 		}
-	
+
+		void computeProductions()
+		{
+			unsigned long i;
+
+			i = 0;
+			while (i < this->_nonTerminals.size())
+			{
+				this->_nonTerminals[i]->computeProductions(*this);
+				i++;
+			}
+		}
+
 	private:
 		
 };

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:34:45 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 15:14:52 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 07:15:50 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ class LRTransition
 		}
 
 	private:
-		AbstractSymbol<T, C>	&_symbol;
-		LRState<T, C>			&state;
+		AbstractSymbol<T, C>	* _symbol;
+		LRState<T, C>			* state;
 
 };
 

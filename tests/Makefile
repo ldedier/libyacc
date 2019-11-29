@@ -6,7 +6,7 @@
 #    By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/04/11 23:08:04 by ldedier           #+#    #+#              #
-#    Updated: 2019/11/28 15:13:42 by ldedier          ###   ########.fr        #
+#    Updated: 2019/11/29 08:01:01 by ldedier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,9 +25,27 @@ OBJ_DIR			=	objs/
 BINDIR			=	./
 INCLUDESDIR		=	includes/
 
-INCLUDES		=	ArithmeticGrammar.hpp 
+INCLUDES		=	ArithmeticGrammar.hpp \
+					Arithmetic.hpp \
+					Expr.hpp \
+					Factor.hpp \
+					Integer.hpp \
+					Term.hpp \
+					Multiply.hpp \
+					Plus.hpp \
+					Minus.hpp \
+					Divide.hpp 
 
 SRCS			=	ArithmeticGrammar.cpp \
+					Arithmetic.cpp \
+					Expr.cpp \
+					Factor.cpp \
+					Integer.cpp \
+					Term.cpp \
+					Multiply.cpp \
+					Plus.cpp \
+					Minus.cpp \
+					Divide.cpp \
 					main.cpp
 
 VPATH			=	$(INCLUDESDIR) \

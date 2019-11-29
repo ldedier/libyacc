@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 06:48:30 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:51:33 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 09:09:53 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,22 @@ template<typename T, typename C>
 class AbstractSymbol
 {
 	public:
-		AbstractSymbol<T, C>(void)
+		AbstractSymbol(void)
+		{
+			
+		}
+
+		AbstractSymbol(std::string identifier): _identifier(identifier)
 		{
 			
 		}
 		
-		AbstractSymbol<T, C>(AbstractSymbol const &instance)
+		AbstractSymbol(AbstractSymbol const &instance)
 		{
 			*this = instance;
 		}
 		
-		AbstractSymbol<T, C> &operator=(AbstractSymbol const &rhs)
+		AbstractSymbol &operator=(AbstractSymbol const &rhs)
 		{
 			static_cast<void>(rhs);
 			return *this;
@@ -41,10 +46,15 @@ class AbstractSymbol
 			
 		}
 
-		virtual std::string repr(void) const = 0;
-		virtual T traverse(ASTNode<T, C>) const = 0;
+		virtual std::string repr(void) const
+		{
+			return _identifier;
+		}
+
+		virtual T traverse(ASTNode<T, C> & ast, C) const = 0;
 
 	private:
+		std::string _identifier;
 };
 
 // std::ostream &operator<<(std::ostream &o, AbstractSymbol<T, C> const &instance);

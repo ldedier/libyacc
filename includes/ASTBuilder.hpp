@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:48:51 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 15:17:37 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 07:12:06 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ class ASTBuilder
 		}
 
 	private:
-		ASTNode<T, C> & _astRoot;
-		ASTNode<T, C> & _cstRoot;
+		ASTNode<T, C> * _astRoot;
+		ASTNode<T, C> * _cstRoot;
 };
 
 // std::ostream &operator<<(std::ostream &o, ASTBuilder const &instance);

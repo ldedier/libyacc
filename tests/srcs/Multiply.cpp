@@ -1,37 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LRItem.hpp                                         :+:      :+:    :+:   */
+/*   Multiply.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 04:41:40 by ldedier          ###   ########.fr       */
+/*   Created: 2019/11/29 07:57:32 by ldedier           #+#    #+#             */
+/*   Updated: 2019/11/29 08:57:05 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LRITEM_HPP
-# define LRITEM_HPP
+#include "Multiply.hpp"
 
-# include <iostream>
-# include "Production.hpp"
-# include "Production.hpp"
-
-class LRItem
+Multiply::Multiply(void) : AbstractToken("*")
 {
-	public:
-		LRItem(void);
-		LRItem(LRItem const &instance);
-		LRItem &operator=(LRItem const &rhs);
-		~LRItem(void);
+	
+}
 
-	private:
-		Production &production;
-		AbstractToken &Lookahead;
-		//progress
+Multiply::~Multiply(void)
+{
+	
+}
 
-
-};
-
-std::ostream &operator<<(std::ostream &o, LRItem const &instance);
-#endif
+int	Multiply::traverse(ASTNode<int, int> & ast, int dummy) const
+{
+	(void)ast;
+	(void)dummy;
+	return 0;
+}

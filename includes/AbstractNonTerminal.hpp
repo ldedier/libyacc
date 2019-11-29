@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:15:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:51:29 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 09:47:48 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@
 # include "AbstractSymbol.hpp"
 # include "AbstractToken.hpp"
 
+
+template<typename T, typename C>
+class AbstractGrammar;
+
 template<typename T, typename C>
 class AbstractNonTerminal : public AbstractSymbol<T, C>
 {
@@ -26,10 +30,17 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 		{
 			
 		}
+
+		AbstractNonTerminal(std::string identifier) : AbstractSymbol<T, C>(identifier)
+		{
+			
+		}
+
 		AbstractNonTerminal(AbstractNonTerminal const &instance)
 		{
 			*this = instance;
 		}
+
 		AbstractNonTerminal &operator=(AbstractNonTerminal const &rhs)
 		{
 			static_cast<void>(rhs);
@@ -41,7 +52,16 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 			
 		}
 
+		void addProduction(AbstractGrammar<T, C> &cfg, int nbSymbols, std::string  *tbl)
+		{
+			Production<T, C> prod(*this, cfg, nbSymbols, tbl);
+			_productions.push_back(prod);
+		}
+
+		virtual void computeProductions(AbstractGrammar<T, C> &cfg) = 0;
+
 	private:
+		std::vector<Production<T, C> > _productions;
 		std::map<AbstractToken<T, C> &, AbstractToken<T, C> &> _first_set;
 };
 

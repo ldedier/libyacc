@@ -1,37 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LRItem.hpp                                         :+:      :+:    :+:   */
+/*   Plus.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 04:41:40 by ldedier          ###   ########.fr       */
+/*   Created: 2019/11/29 07:41:38 by ldedier           #+#    #+#             */
+/*   Updated: 2019/11/29 09:05:35 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LRITEM_HPP
-# define LRITEM_HPP
+#ifndef PLUS_HPP
+# define PLUS_HPP
 
 # include <iostream>
-# include "Production.hpp"
-# include "Production.hpp"
+# include "AbstractToken.hpp"
 
-class LRItem
+class Plus : public AbstractToken<int, int>
 {
 	public:
-		LRItem(void);
-		LRItem(LRItem const &instance);
-		LRItem &operator=(LRItem const &rhs);
-		~LRItem(void);
+		Plus(void);
+		~Plus(void);
+		virtual int traverse(ASTNode<int, int> & ast, int dummy) const;
 
 	private:
-		Production &production;
-		AbstractToken &Lookahead;
-		//progress
-
 
 };
-
-std::ostream &operator<<(std::ostream &o, LRItem const &instance);
 #endif

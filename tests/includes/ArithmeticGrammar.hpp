@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 09:46:25 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 15:58:22 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 08:03:34 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,19 @@
 # define ARITHMETICGRAMMAR_HPP
 
 # include <iostream>
+
 # include "../../includes/AbstractGrammar.hpp"
 
-# define AR_NB_NON_TERMINALS 4
-# define AR_NB_TOKENS 1
+# include "Integer.hpp"
+# include "Arithmetic.hpp"
+# include "Term.hpp"
+# include "Factor.hpp"
+# include "Expr.hpp"
+
+# include "Plus.hpp"
+# include "Minus.hpp"
+# include "Multiply.hpp"
+# include "Divide.hpp"
 
 class ArithmeticGrammar: public AbstractGrammar<int, int>
 {
