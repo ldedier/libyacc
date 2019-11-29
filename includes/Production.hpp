@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:10:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 09:48:04 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 15:34:33 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,37 @@ class Production
 			
 		}
 
+		AbstractSymbol<T, C> *getFrom(void) const
+		{
+			return _from;
+		}
+		
+		std::vector<AbstractSymbol<T, C> *> getSymbols(void) const
+		{
+			return _symbols;
+		}
+		
 	private:
 		AbstractSymbol<T, C> * _from;
 		std::vector<AbstractSymbol<T, C> *> _symbols;
 };
 
-// std::ostream &operator<<(std::ostream &o, Production const &instance);
+template<typename T, typename C>
+std::ostream &operator<<(std::ostream &o, Production<T, C> const &instance)
+{
+	o << *(instance.getFrom()) << " => ";
+	typename std::vector<AbstractSymbol<T, C> * >::iterator it = instance.getSymbols().begin();
+	if (!instance.getSymbols().size())
+		o << "ε";
+	else
+	{
+		while (it != instance.getSymbols().end())
+		{
+			o << *(*it) << " ";
+			it++;
+		}
+	}
+	o << std::endl;
+	return o;
+}
 #endif

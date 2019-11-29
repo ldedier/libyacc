@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:14:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 09:16:22 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 15:50:22 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ class AbstractToken : public AbstractSymbol<T, C>
 		virtual ~AbstractToken(void)
 		{
 			
+		}
+
+		virtual std::string color(void) const
+		{
+			return YACC_BLUE;
 		}
 
 	private:

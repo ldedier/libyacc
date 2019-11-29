@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 09:57:18 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 05:29:40 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 18:57:26 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,14 @@ ArithmeticGrammar::ArithmeticGrammar(void)
 	addNonTerminal(new Factor());
 
 	addToken(new Integer());
+	addToken(new Plus());
+	addToken(new Minus());
+	addToken(new Multiply());
+	addToken(new Divide());
 
 	computeProductions();
+	// computeFirstSets();
+	debugGrammar();
 }
 
 ArithmeticGrammar::ArithmeticGrammar(ArithmeticGrammar const &instance)

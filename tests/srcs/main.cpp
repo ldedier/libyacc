@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 15:08:14 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 08:06:18 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/11/29 15:54:27 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ std::list<AbstractToken<int, int> *> lex(std::istream &stream)
 int main(void)
 {
 	ArithmeticGrammar ag;
+
 	LRParser<int, int> parser(ag);
 	std::list<AbstractToken<int, int> *> tokens;
 
