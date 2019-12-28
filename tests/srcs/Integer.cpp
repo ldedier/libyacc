@@ -29,7 +29,7 @@ Integer::~Integer(void)
 
 std::string	Integer::repr(void) const
 {
-	return "integer";
+	return "integer"; //replace by stoi(_value)
 }
 
 int	Integer::traverse(ASTNode<int, int> & node, int dummy) const
