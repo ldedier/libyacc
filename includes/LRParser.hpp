@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 13:09:46 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/30 16:26:31 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class LRParser
 			_states.push_back(firstState);
 			while (computeStates())
 				;
+			this->debug();
 			
 		}
 
@@ -59,6 +60,19 @@ class LRParser
 
 		~LRParser(void)
 		{
+
+		}
+
+		void debug()
+		{
+			std::cout << "States:" << std::endl;
+		
+			typename std::list <LRState<T, C> >::iterator it = _states.begin();
+			while (it != _states.end())
+			{
+				std::cout << *it;
+				it++;
+			}
 
 		}
 

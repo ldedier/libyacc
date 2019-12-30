@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 13:04:25 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/30 16:32:18 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,11 @@ class LRState
 			return *this;
 		}
 
+		std::vector<LRItem<T, C> *> & getItems()
+		{
+			return _items;
+		}
+
 		virtual ~LRState(void)
 		{
 			
@@ -56,6 +61,15 @@ class LRState
 		std::vector<LRTransition<T, C> *> _transitions;
 
 };
-
-// std::ostream &operator<<(std::ostream &o, LRState const &instance);
+template<typename T, typename C>
+std::ostream &operator<<(std::ostream &o, LRState<T, C> const &instance)
+{
+	typename std::vector<LRItem<T, C> *>::iterator it = instance.getItems().begin();
+	o << "items: " << std::endl << std::endl;
+	while (it != instance.getItems().end())
+	{
+		o << *it << std::endl;	
+		it++;
+	}
+}
 #endif
