@@ -6,7 +6,7 @@
 #    By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/04/11 23:08:04 by ldedier           #+#    #+#              #
-#    Updated: 2019/11/28 09:51:35 by ldedier          ###   ########.fr        #
+#    Updated: 2019/12/29 18:34:44 by ldedier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,6 +28,7 @@ INCLUDESDIR		=	includes/
 
 INCLUDES		=	AbstractSymbol.hpp \
 					ASTNode.hpp \
+					ASTBuilder.hpp \
 					AbstractGrammar.hpp \
 					AbstractLRAction.hpp \
 					AbstractNonTerminal.hpp \
@@ -36,11 +37,16 @@ INCLUDES		=	AbstractSymbol.hpp \
 					LRActionAccept.hpp \
 					LRActionError.hpp \
 					LRActionReduce.hpp \
+					EndOfInput.hpp \
+					Start.hpp \
+					LRActionReduce.hpp \
 					LRActionShift.hpp \
 					LRItem.hpp \
 					LRParser.hpp \
 					LRState.hpp \
 					LRTransition.hpp \
+					Set.hpp \
+
 					Production.hpp
 
 SRCS			=	

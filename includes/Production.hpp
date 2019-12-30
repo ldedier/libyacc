@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:10:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 15:34:33 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/29 19:54:59 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@ class Production
 			}
 		}
 
+		Production(AbstractSymbol<T, C> & from, AbstractGrammar<T, C> &cfg) : _from(&from), _symbols()
+		{
+			_symbols.push_back(cfg.getGrammarStartingSymbol());
+		}
+
 		Production(void)
 		{
 			
@@ -63,7 +68,7 @@ class Production
 			return _from;
 		}
 		
-		std::vector<AbstractSymbol<T, C> *> getSymbols(void) const
+		const std::vector<AbstractSymbol<T, C> *> & getSymbols(void) const
 		{
 			return _symbols;
 		}
@@ -77,7 +82,7 @@ template<typename T, typename C>
 std::ostream &operator<<(std::ostream &o, Production<T, C> const &instance)
 {
 	o << *(instance.getFrom()) << " => ";
-	typename std::vector<AbstractSymbol<T, C> * >::iterator it = instance.getSymbols().begin();
+	typename std::vector<AbstractSymbol<T, C> * >::const_iterator it = instance.getSymbols().begin();
 	if (!instance.getSymbols().size())
 		o << "ε";
 	else

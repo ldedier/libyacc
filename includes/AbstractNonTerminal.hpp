@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:15:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 15:54:18 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/30 02:37:53 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,13 @@
 # include <iostream>
 # include <map>
 # include "AbstractSymbol.hpp"
-# include "AbstractToken.hpp"
-
+# include "Production.hpp"
 
 template<typename T, typename C>
 class AbstractGrammar;
+
+// template<typename T, typename C>
+// class AbstractSymbol;
 
 template<typename T, typename C>
 class AbstractNonTerminal : public AbstractSymbol<T, C>
@@ -58,9 +60,9 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 			_productions.push_back(prod);
 		}
 
-		void printProductions()
+		void printProductions() const
 		{
-			typename std::vector<Production<T, C> * >::iterator it = _productions.begin();
+			typename std::vector<Production<T, C> * >::const_iterator it = _productions.begin();
 			while (it != _productions.end())
 			{
 				std::cout << *(*it);
@@ -74,11 +76,33 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 			return YACC_RED;
 		}
 		
+		std::vector<Production<T, C> *> & getProductions()
+		{
+			return _productions;
+		}
+
+		bool hasEmptyProduction() const
+		{
+			typename std::vector<Production<T, C> * >::const_iterator it = _productions.begin();
+			while (it != _productions.end())
+			{
+				if ((*it)->getSymbols().size() == 0)
+					return true;
+				it++;
+			}
+			return false;
+		}
+
+		virtual void initFirstSet()
+		{
+			if (this->hasEmptyProduction())
+				this->_firstSet.setEpsilon();
+		}
+
 		virtual void computeProductions(AbstractGrammar<T, C> &cfg) = 0;
 
 	private:
 		std::vector<Production<T, C> *> _productions;
-		std::map<AbstractToken<T, C> &, AbstractToken<T, C> &> _first_set;
 };
 
 // std::ostream &operator<<(std::ostream &o, AbstractNonTerminal const &instance);

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 07:11:28 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/30 13:09:46 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,16 @@ class LRParser
 
 		}
 
+
 		LRParser(AbstractGrammar<T, C> & cfg)
 		{
-			(void)cfg;
+			LRState<T, C> firstState;
+
+			firstState = LRState<T, C>(cfg);
+			_states.push_back(firstState);
+			while (computeStates())
+				;
+			
 		}
 
 		LRParser(LRParser const &instance)
@@ -53,6 +60,12 @@ class LRParser
 		~LRParser(void)
 		{
 
+		}
+
+		bool computeStates()
+		{
+			int changes = false;
+			return changes;
 		}
 
 	private:

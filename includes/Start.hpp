@@ -1,38 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   EndOfInput.hpp                                     :+:      :+:    :+:   */
+/*   Start.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/28 08:40:39 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 12:58:26 by ldedier          ###   ########.fr       */
+/*   Created: 2019/12/29 17:49:27 by ldedier           #+#    #+#             */
+/*   Updated: 2019/12/30 12:48:14 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENDOFINPUT_HPP
-# define ENDOFINPUT_HPP
+#ifndef START_HPP
+# define START_HPP
 
 # include <iostream>
-# include "AbstractToken.hpp"
+# include "Production.hpp"
+# include "AbstractNonTerminal.hpp"
 
 template<typename T, typename C>
-class EndOfInput : public AbstractToken<T, C>
+class Start : public AbstractNonTerminal<T, C>
 {
 	public:
-		EndOfInput(void)
+
+		Start(void) : AbstractNonTerminal<T, C>("START")
 		{
-			
+
 		}
-		
-		EndOfInput(EndOfInput const &instance)
+
+		Start(Start const &instance)
 		{
-			*this = instance;
+			static_cast<void>(instance);
 		}
-		EndOfInput &operator=(EndOfInput const &rhs)
+
+		Start &operator=(Start const &rhs)
 		{
-			static_cast<void>(rhs);
+			*this = rhs;
 			return *this;
+		}
+
+		~Start(void)
+		{
+
 		}
 
 		T traverse(ASTNode<T, C> & node, C dummy) const
@@ -42,14 +50,15 @@ class EndOfInput : public AbstractToken<T, C>
 			throw std::exception();
 		}
 
-		virtual ~EndOfInput(void)
+		void computeProductions(AbstractGrammar<T, C> & cfg)
 		{
-			
+			Production<T, C> *prod = new Production<T, C>(*this, cfg);
+			this->getProductions().push_back(prod);
 		}
 
 	private:
 
 };
 
-// std::ostream &operator<<(std::ostream &o, EndOfInput const &instance);
+// std::ostream &operator<<(std::ostream &o, Start<T, C> const &instance);
 #endif
