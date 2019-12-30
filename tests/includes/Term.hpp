@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 18:20:08 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 09:06:10 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/30 01:19:05 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define TERM_HPP
 
 # include <iostream>
-# include "AbstractNonTerminal.hpp"
+// # include "AbstractNonTerminal.hpp"
 # include "ArithmeticGrammar.hpp"
 
 class Term : public AbstractNonTerminal<int, int>

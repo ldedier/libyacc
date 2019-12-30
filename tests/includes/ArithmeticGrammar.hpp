@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 09:46:25 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 15:38:53 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/30 01:21:27 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ class ArithmeticGrammar: public AbstractGrammar<int, int>
 		ArithmeticGrammar(ArithmeticGrammar const &instance);
 		ArithmeticGrammar &operator=(ArithmeticGrammar const &rhs);
 		virtual ~ArithmeticGrammar(void);
+		
+		virtual void fillGrammar(void);
+
 
 	private:
 
