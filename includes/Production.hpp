@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:10:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/29 19:54:59 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 17:21:32 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,12 @@ class Production
 			
 		}
 
-		AbstractSymbol<T, C> *getFrom(void) const
+		AbstractSymbol<T, C> *getFrom(void)
 		{
 			return _from;
 		}
 		
-		const std::vector<AbstractSymbol<T, C> *> & getSymbols(void) const
+		std::vector<AbstractSymbol<T, C> *> & getSymbols(void) 
 		{
 			return _symbols;
 		}
@@ -79,10 +79,10 @@ class Production
 };
 
 template<typename T, typename C>
-std::ostream &operator<<(std::ostream &o, Production<T, C> const &instance)
+std::ostream &operator<<(std::ostream &o, Production<T, C>  &instance)
 {
 	o << *(instance.getFrom()) << " => ";
-	typename std::vector<AbstractSymbol<T, C> * >::const_iterator it = instance.getSymbols().begin();
+	typename std::vector<AbstractSymbol<T, C> * >::iterator it = instance.getSymbols().begin();
 	if (!instance.getSymbols().size())
 		o << "ε";
 	else

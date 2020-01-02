@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 01:28:01 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 16:49:31 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@ class LRState
 			_items.push_back(firstItem);
 		}
 
+		LRState(LRItem<T, C> &item)
+		{
+			_items.push_back(&item);
+		}
+
 		LRState(LRState const &instance)
 		{
 			*this = instance;
@@ -56,11 +61,16 @@ class LRState
 			
 		}
 
-		void addItem(Production<T,C> &production, AbstractToken<T, C> &lookahead)
+		void addNewItem(Production<T,C> &production, AbstractToken<T, C> &lookahead)
 		{
 			LRItem <T, C> *item;
 		
 			item = new LRItem<T, C> (production, lookahead);
+			_items.push_back(item);
+		}
+		
+		void addItem(LRItem<T, C> *item)
+		{
 			_items.push_back(item);
 		}
 
@@ -84,11 +94,46 @@ class LRState
 			return false;
 		}
 
+		LRState<T, C> *getStateByTransition(AbstractSymbol<T, C> &symbol)
+		{
+			typename std::map<AbstractSymbol<T, C> *, LRState<T, C> * >::iterator it = _transitions.find(&symbol);
+
+			if (it != _transitions.end()) {
+				return (it->second);
+			}
+			else {
+				return nullptr;
+			}
+		}
+
+		void link(AbstractSymbol<T, C> &symbol, LRState<T, C> &state)
+		{
+			_transitions.insert(std::pair <AbstractSymbol<T, C> *, LRState<T, C> *>(&symbol, &state));
+		}
+
+		bool hasNextItem(LRItem<T, C> &item)
+		{
+			typename std::vector<LRItem<T, C> *>::iterator it = _items.begin();
+			LRItem<T, C>* currentItem;
+
+			while (it != _items.end())
+			{
+				currentItem = *it;
+				if (&item.getLookahead() == &currentItem->getLookahead()
+					&& &item.getProduction() == &currentItem->getProduction()
+					&& item.getProgress() == currentItem->getProgress() + 1)
+					return true;
+				it++;
+			}
+			return false;
+		}
+
 	private:
 		std::vector<LRItem<T, C> *> _items;
-		std::vector<LRTransition<T, C> *> _transitions;
-
+		std::map<AbstractSymbol<T, C> *, LRState<T, C> *> _transitions;
+		// std::vector<LRTransition<T, C> *> _transitions;
 };
+
 template<typename T, typename C>
 std::ostream &operator<<(std::ostream &o, LRState<T, C> &instance)
 {

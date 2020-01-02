@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 02:14:32 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 17:16:55 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ class LRParser
 			std::cout << "States:" << std::endl << std::endl;
 			int i;
 		
-			typename std::list <LRState<T, C> *>::iterator it = _states.begin();
+			typename std::vector<LRState<T, C> *>::iterator it = _states.begin();
 			i = 0;
 			while (it != _states.end())
 			{
@@ -77,10 +77,74 @@ class LRParser
 			}
 		}
 
+		bool addToStateCheck(LRState<T, C> &destinationState, LRItem<T, C> &item)
+		{
+			LRItem<T, C> *newItem;
+			if (destinationState.hasNextItem(item))
+				return false;
+			else
+			{
+				newItem = item.advance();
+				destinationState.addItem(newItem);
+				return true;
+			}
+		}
+
+		/*
+		** returns the state that contains the appropriate item so that it should be linked by a transition from 'item'
+		*/
+		LRState<T, C> *getStateFromItem(LRItem<T, C> &item)
+		{
+			size_t i = 0;
+
+			while (i < _states.size())
+			{
+				if (_states[i]->hasNextItem(item))
+					return _states[i];
+				i++;
+			}
+			return nullptr;
+		}
+
+		LRState<T, C > *newStateFromItem(LRItem<T, C> &item)
+		{
+			LRState<T, C> *newState;
+		
+			newState = new LRState<T, C>(*item.advance());
+			std::cout << "on add" << *newState << "from" << item ;
+			_states.push_back(newState);
+			return newState;
+		}
+
+		bool computeTransitionsFromItem(LRState<T, C> &state, LRItem<T, C> &item)
+		{
+			LRState<T, C> *destinationState;
+
+			if ((destinationState = state.getStateByTransition(*(*(item.getProgress())))))
+				return addToStateCheck(*destinationState, item);
+			else
+			{
+				if (!(destinationState = getStateFromItem(item)))
+					destinationState = newStateFromItem(item);
+				state.link(*(*(item.getProgress())), *destinationState);
+				return true;
+			}
+		}
+
 		bool computeTransitions(LRState<T, C> &state)
 		{
 			bool changes = false;
-			(void)state;
+			typename std::vector<LRItem<T, C> *>::iterator it;
+			LRItem<T, C>* currentItem;
+
+			size_t i = 0;
+			while (i < state.getItems().size())
+			{
+				currentItem = state.getItems()[i];
+				if (currentItem->getProgress() != currentItem->getProduction().getSymbols().end())
+					changes |= computeTransitionsFromItem(state, *currentItem);
+				i++;
+			}
 			return (changes);
 		}
 
@@ -95,7 +159,7 @@ class LRParser
 				{
 					// std::cout << *(*it) << std::endl;
 					// std::cout << lookahead << std::endl;
-					state.addItem(*(*it), lookahead);
+					state.addNewItem(*(*it), lookahead);
 					changes = true;
 				}
 				it++;
@@ -148,6 +212,7 @@ class LRParser
 			typename std::vector<LRItem<T, C> *>::iterator it;
 			LRItem<T, C>* currentItem;
 			size_t i = 0;
+
 			while (i < state.getItems().size())
 			{
 				currentItem = state.getItems()[i];
@@ -170,20 +235,20 @@ class LRParser
 		bool computeAllStates()
 		{
 			bool changes = false;
-
-			typename std::list <LRState<T, C> * >::iterator it = _states.begin();
-		
-			while (it != _states.end())
+			size_t i = 0;
+			while (i < _states.size())
 			{
-				changes |= computeState(*(*it));
-				it++;
+				changes |= computeState(*(_states[i]));
+				i++;
 			}
+			debug();
+			exit(1);
 			return changes;
 		}
 
 	private:
 		std::vector < std::vector <AbstractLRAction<T, C> > > _tables;
-		std::list <LRState<T, C> * > _states;
+		std::vector <LRState<T, C> * > _states;
 		AbstractGrammar<T, C> *_cfg;
 
 };

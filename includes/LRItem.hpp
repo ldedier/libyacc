@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 01:28:36 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 17:24:43 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,13 @@ class LRItem
 			
 		}
 
+		LRItem(Production<T, C> &production, AbstractToken<T, C> &lookahead,
+			typename std::vector<AbstractSymbol<T, C> *>::const_iterator it): _isParsed(false), _production(production),
+				_lookahead(lookahead), _progress(it)
+		{
+			
+		}
+
 		LRItem(LRItem const &instance)
 		{
 			*this = instance;
@@ -47,7 +54,6 @@ class LRItem
 		{
 
 		}
-
 
 		typename std::vector<AbstractSymbol<T, C> *>::const_iterator & getProgress(void)
 		{
@@ -74,12 +80,17 @@ class LRItem
 			_isParsed = parsed;
 		}
 
+		LRItem<T, C> *advance()
+		{
+			return new LRItem<T, C>(this->_production, this->_lookahead, this->_progress + 1);
+		}
+
 	private:
 
 		bool					_isParsed;
 		Production<T, C> &		_production;
 		AbstractToken<T, C> &	_lookahead;
-		typename std::vector<AbstractSymbol<T, C> *>::const_iterator _progress;
+		typename std::vector<AbstractSymbol<T, C> *>::const_iterator  _progress;
 };
 
 template<typename T, typename C>
@@ -93,13 +104,13 @@ std::ostream &operator<<(std::ostream &o, LRItem<T, C> &instance)
 		o << *(*it);
 		it++;
 	}
-	std::cout << "·";
+	std::cout << "· ";
 	while (it != instance.getProduction().getSymbols().end())
 	{
-		o << *(*it);
+		o << *(*it) << " ";
 		it++;
 	}
-	o << " (for lookahead: [" << instance.getLookahead() << "])";
+	o << "(for lookahead: [" << instance.getLookahead() << "])";
 	return o;
 }
 
