@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 16:40:10 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 01:28:36 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ template<typename T, typename C>
 class LRItem
 {
 	public:
-		LRItem(void)
+		LRItem(void) : _isParsed(false)
 		{
 
 		}
 
-		LRItem(Production<T, C> &production, AbstractToken<T, C> &lookahead): _production(production),
+		LRItem(Production<T, C> &production, AbstractToken<T, C> &lookahead): _isParsed(false), _production(production),
 			_lookahead(lookahead), _progress(production.getSymbols().begin())
 		{
 			
@@ -64,29 +64,42 @@ class LRItem
 			return _production;
 		}
 
+		bool isParsed()
+		{
+			return _isParsed;
+		}
+
+		void setParsed(bool parsed)
+		{
+			_isParsed = parsed;
+		}
+
 	private:
-		Production<T, C> & _production;
-		AbstractToken<T, C> & _lookahead;
+
+		bool					_isParsed;
+		Production<T, C> &		_production;
+		AbstractToken<T, C> &	_lookahead;
 		typename std::vector<AbstractSymbol<T, C> *>::const_iterator _progress;
 };
 
 template<typename T, typename C>
-std::ostream &operator<<(std::ostream &o, LRItem<T, C> const &instance)
+std::ostream &operator<<(std::ostream &o, LRItem<T, C> &instance)
 {
 	typename std::vector<AbstractSymbol<T, C> *>::const_iterator it = instance.getProduction().getSymbols().begin();
 	
-	o << *instance.getProduction().getFrom() << "=>";
+	o << *(instance.getProduction().getFrom()) << " → ";
 	while (it != instance.getProgress())
 	{
 		o << *(*it);
 		it++;
 	}
-	
+	std::cout << "·";
 	while (it != instance.getProduction().getSymbols().end())
 	{
 		o << *(*it);
 		it++;
 	}
+	o << " (for lookahead: [" << instance.getLookahead() << "])";
 	return o;
 }
 

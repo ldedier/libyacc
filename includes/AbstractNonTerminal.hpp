@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:15:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 02:37:53 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/01 17:57:00 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,11 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 		{
 			if (this->hasEmptyProduction())
 				this->_firstSet.setEpsilon();
+		}
+
+		virtual bool isTerminal()
+		{
+			return false;
 		}
 
 		virtual void computeProductions(AbstractGrammar<T, C> &cfg) = 0;

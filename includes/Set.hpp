@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/28 19:03:16 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/29 16:18:18 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 01:57:12 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,13 @@
 
 # include <iostream>
 # include <map>
+// # include "AbstractGrammar.hpp"
 
 template<typename T, typename C>
 class AbstractToken;
+
+template<typename T, typename C>
+class AbstractGrammar;
 
 template<typename T, typename C>
 class Set
@@ -31,6 +35,38 @@ class Set
 		Set(Set const &instance)
 		{
 			*this = instance;
+		}
+
+		void addTransitive(AbstractSymbol<T, C> &symbol)
+		{
+			typename std::map<std::string, AbstractToken<T, C> * >::iterator it = symbol.getFirstSet().getTokensMap().begin();
+
+			while (it != symbol.getFirstSet().getTokensMap().end())
+			{
+				if (_tokensMap.find(it->first) == _tokensMap.end()) 
+				{
+					_tokensMap.insert(std::pair <std::string, AbstractToken<T, C> *>(it->first, it->second));
+				}
+				it++;
+			}
+		}
+
+		Set(AbstractGrammar<T, C> &grammar,
+			typename std::vector<AbstractSymbol<T, C> *>::const_iterator &it,
+				const std::vector<AbstractSymbol<T, C> *> & symbols,
+					AbstractToken<T, C> &lookahead)
+		{
+			AbstractSymbol<T, C> *symbol;
+			(void)grammar;
+			while (it != symbols.end())
+			{
+				symbol = *it;
+				addTransitive(*symbol);
+				if (!symbol->getFirstSet().hasEpsilon())
+					return ;
+				it++;
+			}
+			addTransitive(lookahead);
 		}
 
 		Set &operator=(Set const &rhs)

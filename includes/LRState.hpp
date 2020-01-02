@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 16:32:18 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 01:28:01 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,20 +56,48 @@ class LRState
 			
 		}
 
+		void addItem(Production<T,C> &production, AbstractToken<T, C> &lookahead)
+		{
+			LRItem <T, C> *item;
+		
+			item = new LRItem<T, C> (production, lookahead);
+			_items.push_back(item);
+		}
+
+		bool hasItem(Production<T,C> &production, AbstractToken<T, C> &lookahead)
+		{
+			LRItem<T, C> *item;
+			typename std::vector<LRItem<T, C> *>::iterator it = _items.begin();
+		
+			while (it != _items.end())
+			{
+				item = *it;
+
+				if (&item->getProduction() == &production
+					&& &item->getLookahead() == &lookahead
+					&& item->getProgress() == item->getProduction().getSymbols().begin())
+				{
+					return true;
+				}
+				it++;
+			}
+			return false;
+		}
+
 	private:
 		std::vector<LRItem<T, C> *> _items;
 		std::vector<LRTransition<T, C> *> _transitions;
 
 };
 template<typename T, typename C>
-std::ostream &operator<<(std::ostream &o, LRState<T, C> const &instance)
+std::ostream &operator<<(std::ostream &o, LRState<T, C> &instance)
 {
 	typename std::vector<LRItem<T, C> *>::iterator it = instance.getItems().begin();
-	o << "items: " << std::endl << std::endl;
 	while (it != instance.getItems().end())
 	{
-		o << *it << std::endl;	
+		o << *(*it) << std::endl;	
 		it++;
 	}
+	return o;
 }
 #endif

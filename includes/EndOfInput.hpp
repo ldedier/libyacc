@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:40:39 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 12:58:26 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/31 14:49:16 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ template<typename T, typename C>
 class EndOfInput : public AbstractToken<T, C>
 {
 	public:
-		EndOfInput(void)
+		EndOfInput(void) : AbstractToken<T, C>("_EOI_")
 		{
 			
 		}

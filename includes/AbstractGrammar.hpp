@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 12:58:20 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 01:55:06 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class AbstractGrammar
 			addNonTerminal(_startGrammarSymbol);
 			_startSymbol = new Start<T, C>();
 			_endOfInput = new EndOfInput<T, C>();
+			addToken(_endOfInput);
 		}
 
 		AbstractGrammar(AbstractGrammar<T, C> const &instance)

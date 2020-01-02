@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 04:42:37 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 01:18:56 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 02:16:22 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,6 @@ int	Expr::traverse(ASTNode<int, int> & node, int dummy) const
 void	Expr::computeProductions(AbstractGrammar<int, int> &cfg)
 {
 	addProduction(cfg, 1, (std::string []){"term"});
-	addProduction(cfg, 3, (std::string []){"term", "+", "term"});
-	addProduction(cfg, 3, (std::string []){"term", "-", "term"});
+	addProduction(cfg, 3, (std::string []){"expr", "+", "term"});
+	addProduction(cfg, 3, (std::string []){"expr", "-", "term"});
 }

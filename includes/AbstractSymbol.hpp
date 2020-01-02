@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 06:48:30 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 01:21:16 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/01 19:20:51 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 
 template<typename T, typename C>
 class AbstractGrammar;
-
 
 template<typename T, typename C>
 class AbstractSymbol
@@ -76,14 +75,14 @@ class AbstractSymbol
 			std::cout << this->_firstSet;
 			std::cout << std::endl;
 		}
-		
+
+		virtual bool isTerminal() = 0;
 		virtual void initFirstSet() = 0;
 		virtual T traverse(ASTNode<T, C> & ast, C) const = 0;
 		virtual std::string color(void) const = 0;
 
 	private:
 		std::string _identifier;
-	
 	protected:
 		Set<T, C> _firstSet;
 };

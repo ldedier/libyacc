@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/29 17:49:27 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 12:48:14 by ldedier          ###   ########.fr       */
+/*   Updated: 2019/12/31 14:49:35 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class Start : public AbstractNonTerminal<T, C>
 {
 	public:
 
-		Start(void) : AbstractNonTerminal<T, C>("START")
+		Start(void) : AbstractNonTerminal<T, C>("_START_")
 		{
 
 		}
