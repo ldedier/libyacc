@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:41:38 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 09:05:35 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define PLUS_HPP
 
 # include <iostream>
-# include "AbstractToken.hpp"
+# include "AbstractTerminal.hpp"
 
-class Plus : public AbstractToken<int, int>
+class Plus : public AbstractTerminal<int, int>
 {
 	public:
 		Plus(void);

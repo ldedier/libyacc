@@ -6,7 +6,7 @@
 #    By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/04/11 23:08:04 by ldedier           #+#    #+#              #
-#    Updated: 2019/12/29 18:34:44 by ldedier          ###   ########.fr        #
+#    Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,12 +33,10 @@ INCLUDES		=	AbstractSymbol.hpp \
 					AbstractLRAction.hpp \
 					AbstractNonTerminal.hpp \
 					AbstractSymbol.hpp \
-					AbstractToken.hpp \
+					AbstractTerminal.hpp \
 					LRActionAccept.hpp \
 					LRActionError.hpp \
 					LRActionReduce.hpp \
-					EndOfInput.hpp \
-					Start.hpp \
 					LRActionReduce.hpp \
 					LRActionShift.hpp \
 					LRItem.hpp \
@@ -46,7 +44,9 @@ INCLUDES		=	AbstractSymbol.hpp \
 					LRState.hpp \
 					LRTransition.hpp \
 					Set.hpp \
-
+					EndOfInput.hpp \
+					Start.hpp \
+					Token.hpp \
 					Production.hpp
 
 SRCS			=	

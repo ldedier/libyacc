@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:54:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 09:05:39 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define MINUS_HPP
 
 # include <iostream>
-# include "AbstractToken.hpp"
+# include "AbstractTerminal.hpp"
 
-class Minus : public AbstractToken<int, int>
+class Minus : public AbstractTerminal<int, int>
 {
 	public:
 		Minus(void);

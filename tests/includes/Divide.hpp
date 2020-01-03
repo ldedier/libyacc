@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:53:32 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 08:54:31 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define DIVIDE_HPP
 
 # include <iostream>
-# include "AbstractToken.hpp"
+# include "AbstractTerminal.hpp"
 
-class Divide : public AbstractToken<int, int>
+class Divide : public AbstractTerminal<int, int>
 {
 	public:
 		Divide(void);

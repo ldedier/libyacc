@@ -6,13 +6,13 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:58:44 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 08:50:57 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Divide.hpp"
 
-Divide::Divide(void) : AbstractToken("/")
+Divide::Divide(void) : AbstractTerminal("/")
 {
 	
 }

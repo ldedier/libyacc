@@ -6,34 +6,35 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 15:08:14 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 16:40:11 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 01:30:57 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ArithmeticGrammar.hpp"
 #include "LRParser.hpp"
 #include "ASTBuilder.hpp"
+#include "Token.hpp"
 #include <fstream>
 
-std::list<AbstractToken<int, int> *> lex(std::istream &stream)
+std::list<Token<int, int> *> lex(std::istream &stream, ArithmeticGrammar &cfg)
 {
 	char c;
 
-	std::list<AbstractToken<int, int> *> res;
+	std::list<Token<int, int> *> res;
 	while (stream.get(c))
 	{
 		if (c == '\n')
 			return res;
 		if (c == '+')
-			res.push_back(new Plus());
+			res.push_back(new Token<int, int>(*(cfg.getTerminal("+"))));
 		else if (c == '*')
-			res.push_back(new Multiply());
+			res.push_back(new Token<int, int>(*(cfg.getTerminal("*"))));
 		else if (c == '/')
-			res.push_back(new Divide());
+			res.push_back(new Token<int, int>(*(cfg.getTerminal("/"))));
 		else if (c == '-')
-			res.push_back(new Minus());
+			res.push_back(new Token<int, int>(*(cfg.getTerminal("-"))));
 		else if (isdigit(c))
-			res.push_back(new Integer(c - '0'));
+			res.push_back(new Token<int, int>(*(cfg.getTerminal("integer")), c - '0'));
 		else if (!isspace(c))
 			throw std::exception();
 	}
@@ -45,11 +46,11 @@ int main(void)
 	ArithmeticGrammar ag;
 
 	LRParser<int, int> parser(ag);
-	std::list<AbstractToken<int, int> *> tokens;
+	std::list<Token<int, int> *> tokens;
 
-	tokens = lex(std::cin);
+	tokens = lex(std::cin, ag);
 	try {
-		ASTBuilder<int, int> b = parser.parse();
+		ASTBuilder<int, int> b = parser.parse(tokens);
 	}
 	catch (std::exception e)
 	{

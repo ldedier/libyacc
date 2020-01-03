@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 06:48:30 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/01 19:20:51 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 23:07:32 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@
 # define YACC_EOC	"\033[0m"                                                   
 # define YACC_BLUE	"\x1B[34m"
 # define YACC_RED	"\x1B[31m"
+# define YACC_GREEN	"\x1B[33m"
+# define YACC_YELLOW	"\x1B[32m"
+# define YACC_ACCEPT	"\x1B[35m"
 
 template<typename T, typename C>
 class AbstractGrammar;
@@ -69,6 +72,16 @@ class AbstractSymbol
 			return _firstSet;
 		}
 
+		int getIndex()
+		{
+			return _index;
+		}
+
+		void setIndex(int index)
+		{
+			_index = index;
+		}
+
 		void printFirstSet()
 		{
 			std::cout << *this << ":" << std::endl;
@@ -83,6 +96,7 @@ class AbstractSymbol
 
 	private:
 		std::string _identifier;
+		int			_index;
 	protected:
 		Set<T, C> _firstSet;
 };
@@ -90,11 +104,7 @@ class AbstractSymbol
 template<typename T, typename C>
 std::ostream &operator<<(std::ostream &o, AbstractSymbol<T, C> const &instance)
 {
-	(void)o;
-	(void)instance;
 	o << instance.color() << instance.repr() << YACC_EOC;
-	// o << YACC_RED << YACC_EOC;
-	// o << "salut";
 	return o;
 }
 #endif

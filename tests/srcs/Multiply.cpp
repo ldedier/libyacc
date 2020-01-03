@@ -6,13 +6,13 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:57:32 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 08:57:05 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Multiply.hpp"
 
-Multiply::Multiply(void) : AbstractToken("*")
+Multiply::Multiply(void) : AbstractTerminal("*")
 {
 	
 }

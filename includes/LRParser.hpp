@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 17:16:55 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 01:32:46 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,12 @@
 # include <map>
 # include "AbstractLRAction.hpp"
 # include "LRState.hpp"
+# include "LRActionError.hpp"
+# include "LRActionReduce.hpp"
+# include "LRActionShift.hpp"
+# include "LRActionAccept.hpp"
 # include "ASTBuilder.hpp"
+# include "Token.hpp"
 
 template<typename T, typename C>
 class LRParser
@@ -35,8 +40,8 @@ class LRParser
 			firstState = new LRState<T, C>(cfg);
 			_states.push_back(firstState);
 			while (computeAllStates())
-			{
-			}
+				;
+			computeTables();
 			this->debug();
 		}
 
@@ -51,9 +56,10 @@ class LRParser
 			return *this;
 		}
 
-		ASTBuilder<T, C> parse(void)
+		ASTBuilder<T, C> parse(std::list<Token<T, C> *> &tokens)
 		{
 			ASTBuilder<T, C> res;
+			(void)tokens;
 			return res;
 		}
 
@@ -75,6 +81,33 @@ class LRParser
 				std::cout << *(*it);
 				it++;
 			}
+			printTable();
+		}
+
+		void printTable()
+		{
+			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _cfg->getSymbolsMap().begin();
+			std::cout << "\t";
+			size_t i = 0;
+			while (it != _cfg->getSymbolsMap().end())
+			{
+				std::cout << *(it->second) << '\t';
+				it++;
+			}
+			std::cout << std::endl;
+			while (i < _states.size())
+			{
+				it = _cfg->getSymbolsMap().begin();
+				std::cout << i << "\t";
+				while (it != _cfg->getSymbolsMap().end())
+				{
+					std::cout << *(_tables[i][(it->second)->getIndex()]) << '\t';
+					it++;
+				}
+				std::cout << std::endl;
+				i++;
+			}
+			std::cout << std::endl;
 		}
 
 		bool addToStateCheck(LRState<T, C> &destinationState, LRItem<T, C> &item)
@@ -111,7 +144,7 @@ class LRParser
 			LRState<T, C> *newState;
 		
 			newState = new LRState<T, C>(*item.advance());
-			std::cout << "on add" << *newState << "from" << item ;
+			// std::cout << "on add" << *newState << "from" << item ;
 			_states.push_back(newState);
 			return newState;
 		}
@@ -148,7 +181,7 @@ class LRParser
 			return (changes);
 		}
 
-		bool computeClosureFromLookahead(LRState<T, C> &state, AbstractNonTerminal<T, C> & nonTerminal, AbstractToken<T, C> &lookahead)
+		bool computeClosureFromLookahead(LRState<T, C> &state, AbstractNonTerminal<T, C> & nonTerminal, AbstractTerminal<T, C> &lookahead)
 		{
 			int changes = false;
 		
@@ -170,7 +203,7 @@ class LRParser
 		bool computeClosureFromNonTerminal(LRState<T, C> &state, AbstractNonTerminal<T, C> & nonTerminal, Set<T, C> &set)
 		{
 			bool changes = false;
-			typename std::map<std::string, AbstractToken<T, C> * >::iterator it = set.getTokensMap().begin();
+			typename std::map<std::string, AbstractTerminal<T, C> * >::iterator it = set.getTokensMap().begin();
 
 			while (it != set.getTokensMap().end())
 			{
@@ -241,15 +274,103 @@ class LRParser
 				changes |= computeState(*(_states[i]));
 				i++;
 			}
-			debug();
-			exit(1);
 			return changes;
 		}
 
+		void initTables()
+		{
+			size_t i = 0;
+
+			_tables = new AbstractLRAction<T, C> **[_states.size()];
+			while (i <_states.size())
+			{
+				_tables[i] = new AbstractLRAction<T, C> *[_cfg->getSymbolsMap().size()];
+				size_t j = 0;
+				while (j < _cfg->getSymbolsMap().size())
+				{
+					_tables[i][j] = new LRActionError<T, C>();
+					j++;
+				}
+				i++;
+			}
+		}
+
+		void computeReduce(LRState<T, C> &currentState, int stateIndex)
+		{
+			size_t					j;
+			LRItem<T, C>			*currentItem;
+			LRActionShift<T, C>		*testShift;
+			LRActionReduce<T, C>	*testReduce;
+
+			j = 0;
+			while (j < currentState.getItems().size())
+			{
+				currentItem = currentState.getItems()[j];
+				if (currentItem->getProgress() == currentItem->getProduction().getSymbols().end())
+				{
+					if ((testReduce = dynamic_cast<LRActionReduce<T, C> *>(_tables[stateIndex][currentItem->getLookahead().getIndex()])))
+					{
+						std::cerr << "Reduce Reduce conflict" << std::endl;
+					}
+					if ((testShift = dynamic_cast<LRActionShift<T, C> *>(_tables[stateIndex][currentItem->getLookahead().getIndex()])))
+					{
+						std::cerr << "Shift Reduce conflict" << std::endl;
+					}
+					if (currentItem->getProduction().getFrom() == _cfg->getStartingSymbol())
+					{
+						delete _tables[stateIndex][currentItem->getLookahead().getIndex()];
+						_tables[stateIndex][currentItem->getLookahead().getIndex()] = new LRActionAccept<T, C>();
+					}
+					else
+					{
+						delete _tables[stateIndex][currentItem->getLookahead().getIndex()];
+						_tables[stateIndex][currentItem->getLookahead().getIndex()] = new LRActionReduce<T, C>(currentItem->getProduction());
+					}
+				}
+				j++;
+			}
+		}
+
+		void computeShift(LRState<T, C> &state, int stateIndex)
+		{
+			LRActionShift<T, C>		*testShift;
+			LRActionReduce<T, C>	*testReduce;
+			typename std::map<AbstractSymbol<T, C> *, LRState<T, C> *>::iterator it = state.getTransitions().begin();
+			
+			while (it != state.getTransitions().end())
+			{
+				if ((testReduce = dynamic_cast<LRActionReduce<T, C> *>(_tables[stateIndex][(it->first)->getIndex()])))
+				{
+					std::cerr << "Shift Reduce conflict" << std::endl;
+				}
+				if ((testShift = dynamic_cast<LRActionShift<T, C> *>(_tables[stateIndex][(it->first)->getIndex()])))
+				{
+					std::cerr << "Shift Shift conflict" << std::endl;
+				}
+				delete _tables[stateIndex][(it->first)->getIndex()];
+				_tables[stateIndex][(it->first)->getIndex()] = new LRActionShift<T, C>(*(it->second));
+				it++;
+			}
+		}
+
+		void computeTables()
+		{
+			size_t i = 0;
+			LRState<T, C> *currentState;
+			
+			initTables();
+			while (i < _states.size())
+			{
+				currentState = _states[i];
+				computeReduce(*currentState, i);
+				computeShift(*currentState, i);
+				i++;
+			}
+		}
+
 	private:
-		std::vector < std::vector <AbstractLRAction<T, C> > > _tables;
+		AbstractLRAction<T, C> ***_tables;
 		std::vector <LRState<T, C> * > _states;
 		AbstractGrammar<T, C> *_cfg;
-
 };
 #endif

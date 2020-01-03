@@ -1,48 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   AbstractToken.hpp                                  :+:      :+:    :+:   */
+/*   AbstractTerminal.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:14:12 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/01 17:56:43 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 01:02:29 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ABSTRACTTOKEN_HPP
-# define ABSTRACTTOKEN_HPP
+#ifndef ABSTRACTTERMINAL_HPP
+# define ABSTRACTTERMINAL_HPP
 
 # include <iostream>
 # include "AbstractSymbol.hpp"
 # include "Production.hpp"
 
 template<typename T, typename C>
-class AbstractToken : public AbstractSymbol<T, C>
+class AbstractTerminal : public AbstractSymbol<T, C>
 {
 	public:
-		AbstractToken(void)
+		AbstractTerminal(void)
 		{
 			
 		}
 
-		AbstractToken(std::string identifier) : AbstractSymbol<T, C>(identifier)
+		AbstractTerminal(std::string identifier) : AbstractSymbol<T, C>(identifier)
 		{
 			
 		}
 
-		AbstractToken(AbstractToken<T, C> const &instance)
+		AbstractTerminal(AbstractTerminal<T, C> const &instance)
 		{
 			*this = instance;
 		}
 
-		AbstractToken &operator=(AbstractToken<T, C> const &rhs)
+		AbstractTerminal &operator=(AbstractTerminal<T, C> const &rhs)
 		{
 			static_cast<void>(rhs);
 			return *this;
 		}
 		
-		virtual ~AbstractToken(void)
+		virtual ~AbstractTerminal(void)
 		{
 			
 		}
@@ -67,5 +67,5 @@ class AbstractToken : public AbstractSymbol<T, C>
 
 };
 
-// std::ostream &operator<<(std::ostream &o, AbstractToken const &instance);
+// std::ostream &operator<<(std::ostream &o, AbstractTerminal const &instance);
 #endif

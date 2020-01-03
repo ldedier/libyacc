@@ -6,13 +6,13 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:59:12 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 08:56:50 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Minus.hpp"
 
-Minus::Minus(void) : AbstractToken("-")
+Minus::Minus(void) : AbstractTerminal("-")
 {
 	
 }

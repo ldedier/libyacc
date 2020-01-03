@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:30:29 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:54:37 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:00:33 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,12 @@ class LRActionReduce : public AbstractLRAction<T, C>
 		{
 			
 		}
+
+		LRActionReduce(Production<T, C> &prod) : _production(&prod)
+		{
+			
+		}
+
 		LRActionReduce(LRActionReduce const &instance)
 		{
 			*this = instance;
@@ -38,8 +44,18 @@ class LRActionReduce : public AbstractLRAction<T, C>
 			
 		}
 
-	private:
+		virtual std::string repr(void) const
+		{
+			return "REDUCE";
+		}
+		
+		virtual std::string color(void) const
+		{
+			return YACC_YELLOW;
+		}
 
+	private:
+		Production<T, C> *_production;
 };
 
 // std::ostream &operator<<(std::ostream &o, LRActionReduce const &instance);

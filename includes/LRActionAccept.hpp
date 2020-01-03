@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:29:58 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:53:46 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 23:07:39 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,16 @@ class LRActionAccept : public AbstractLRAction<T, C>
 		virtual ~LRActionAccept(void)
 		{
 			
+		}
+
+		virtual std::string repr(void) const
+		{
+			return "ACCEPT";
+		}
+
+		virtual std::string color(void) const
+		{
+			return YACC_ACCEPT;
 		}
 
 	private:

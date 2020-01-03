@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 01:55:06 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 01:14:41 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include <iostream>
 # include "AbstractSymbol.hpp"
-# include "AbstractToken.hpp"
+# include "AbstractTerminal.hpp"
 # include "AbstractNonTerminal.hpp"
 # include "Start.hpp"
 # include "EndOfInput.hpp"
@@ -27,7 +27,7 @@ class AbstractGrammar
 		
 		AbstractGrammar(void) {}
 
-		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol) : _startGrammarSymbol(startGrammarSymbol)
+		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol) : _startGrammarSymbol(startGrammarSymbol), _index(0)
 		{
 			addNonTerminal(_startGrammarSymbol);
 			_startSymbol = new Start<T, C>();
@@ -59,6 +59,27 @@ class AbstractGrammar
 				return it->second;
 			}
 			else {
+				std::cout << "not found: " << identifier << std::endl;
+				throw std::exception();
+			}
+		}
+
+		AbstractTerminal<T, C> *getTerminal(std::string identifier)
+		{
+			AbstractTerminal<T, C> *res;
+			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _symbolsMap.find(identifier);
+			
+			if (it != _symbolsMap.end())
+			{
+				if (!(res = dynamic_cast<AbstractTerminal<T,C> *>(it->second)))
+				{
+					std::cout << "not found token: " << identifier << std::endl;
+					throw std::exception();
+				}
+				return res;
+			}
+			else
+			{
 				std::cout << "not found: " << identifier << std::endl;
 				throw std::exception();
 			}
@@ -105,6 +126,11 @@ class AbstractGrammar
 			return _startSymbol;
 		}
 
+		std::map<std::string, AbstractSymbol<T, C> *> &getSymbolsMap()
+		{
+			return _symbolsMap;
+		}
+
 	protected:
 
 		void addNonTerminal(AbstractNonTerminal<T, C> * nonTerminal)
@@ -113,7 +139,7 @@ class AbstractGrammar
 			addSymbol(nonTerminal);
 		}
 		
-		void addToken(AbstractToken<T, C> *token)
+		void addToken(AbstractTerminal<T, C> *token)
 		{
 			_tokens.push_back(token);
 			addSymbol(token);
@@ -135,13 +161,13 @@ class AbstractGrammar
 		int addToFirstSetByProductionFromSymbol(AbstractNonTerminal<T, C> &nonTerminal, AbstractSymbol<T, C>* symbol)
 		{
 			int changes = 0;
-			typename std::map<std::string, AbstractToken<T, C> * >::iterator it = symbol->getFirstSet().getTokensMap().begin();
+			typename std::map<std::string, AbstractTerminal<T, C> * >::iterator it = symbol->getFirstSet().getTokensMap().begin();
 
 			while (it != symbol->getFirstSet().getTokensMap().end()) //iterate through first sets of symbol
 			{
 				if (nonTerminal.getFirstSet().getTokensMap().find(it->first) == nonTerminal.getFirstSet().getTokensMap().end()) // check if is not in nonterminal
 				{
-					nonTerminal.getFirstSet().getTokensMap().insert(std::pair <std::string, AbstractToken<T, C> *>(it->first, it->second));
+					nonTerminal.getFirstSet().getTokensMap().insert(std::pair <std::string, AbstractTerminal<T, C> *>(it->first, it->second));
 					changes |= 1;
 				}
 				it++;
@@ -207,21 +233,19 @@ class AbstractGrammar
 
 		void addSymbol(AbstractSymbol <T, C> *symbol)
 		{
+			symbol->setIndex(_index++);
 			_symbolsMap.insert(std::pair <std::string, AbstractSymbol<T, C> *>(symbol->getIdentifier(), symbol));
 		}
 
-
-
 		virtual void fillGrammar() = 0;
 
-		Start<T, C> * _startSymbol;
-		AbstractNonTerminal<T, C> * _startGrammarSymbol;
-		EndOfInput<T, C> * _endOfInput;
-
-		std::vector<AbstractNonTerminal<T, C> *> _nonTerminals;
-		std::vector<AbstractToken<T, C> *> _tokens;
-		
-		std::map<std::string, AbstractSymbol<T, C> *> _symbolsMap;
+		Start<T, C>										* _startSymbol;
+		AbstractNonTerminal<T, C>						* _startGrammarSymbol;
+		EndOfInput<T, C>								* _endOfInput;
+		int												_index;
+		std::vector<AbstractNonTerminal<T, C> *>		_nonTerminals;
+		std::vector<AbstractTerminal<T, C> *>				_tokens;
+		std::map<std::string, AbstractSymbol<T, C> *>	_symbolsMap;
 
 };
 

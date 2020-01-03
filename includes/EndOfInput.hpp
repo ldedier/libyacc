@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:40:39 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/31 14:49:16 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 # define ENDOFINPUT_HPP
 
 # include <iostream>
-# include "AbstractToken.hpp"
+# include "AbstractTerminal.hpp"
 
 template<typename T, typename C>
-class EndOfInput : public AbstractToken<T, C>
+class EndOfInput : public AbstractTerminal<T, C>
 {
 	public:
-		EndOfInput(void) : AbstractToken<T, C>("_EOI_")
+		EndOfInput(void) : AbstractTerminal<T, C>("_EOI_")
 		{
 			
 		}

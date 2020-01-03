@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:28:41 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:53:58 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 23:01:08 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,20 @@ class AbstractLRAction
 			
 		}
 
+		virtual std::string repr(void) const = 0;
+		virtual std::string color(void) const = 0;
+
 	private:
 
 };
 
+template<typename T, typename C>
+std::ostream &operator<<(std::ostream &o, AbstractLRAction<T, C> const &instance)
+{
+	(void)o;
+	(void)instance;
+	o << instance.color() << instance.repr() << YACC_EOC;
+	return o;
+}
 // std::ostream &operator<<(std::ostream &o, AbstractLRAction const &instance);
 #endif

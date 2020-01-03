@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:23:18 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 02:04:38 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ template<typename T, typename C>
 class AbstractSymbol;
 
 template<typename T, typename C>
-class AbstractToken;
+class AbstractTerminal;
 
 template<typename T, typename C>
 class ASTNode
@@ -50,7 +50,7 @@ class ASTNode
 
 	private:
 		AbstractSymbol<T, C> & _symbol;
-		AbstractToken<T, C> * _token;
+		AbstractTerminal<T, C> * _token;
 		std::list<ASTNode<T, C> &> _children;
 		ASTNode<T, C> *_parent;
 };

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:29:09 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/28 14:53:53 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/02 23:01:45 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,16 @@ class LRActionError : public AbstractLRAction<T, C>
 		virtual ~LRActionError(void)
 		{
 			
+		}
+
+		virtual std::string repr(void) const
+		{
+			return "ERROR";
+		}
+
+		virtual std::string color(void) const
+		{
+			return YACC_RED;
 		}
 
 	private:

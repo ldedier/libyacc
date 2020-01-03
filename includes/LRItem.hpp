@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 17:24:43 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ class LRItem
 
 		}
 
-		LRItem(Production<T, C> &production, AbstractToken<T, C> &lookahead): _isParsed(false), _production(production),
+		LRItem(Production<T, C> &production, AbstractTerminal<T, C> &lookahead): _isParsed(false), _production(production),
 			_lookahead(lookahead), _progress(production.getSymbols().begin())
 		{
 			
 		}
 
-		LRItem(Production<T, C> &production, AbstractToken<T, C> &lookahead,
+		LRItem(Production<T, C> &production, AbstractTerminal<T, C> &lookahead,
 			typename std::vector<AbstractSymbol<T, C> *>::const_iterator it): _isParsed(false), _production(production),
 				_lookahead(lookahead), _progress(it)
 		{
@@ -60,7 +60,7 @@ class LRItem
 			return _progress;
 		}
 		
-		AbstractToken<T, C> & getLookahead(void)
+		AbstractTerminal<T, C> & getLookahead(void)
 		{
 			return _lookahead;
 		}
@@ -89,7 +89,7 @@ class LRItem
 
 		bool					_isParsed;
 		Production<T, C> &		_production;
-		AbstractToken<T, C> &	_lookahead;
+		AbstractTerminal<T, C> &	_lookahead;
 		typename std::vector<AbstractSymbol<T, C> *>::const_iterator  _progress;
 };
 

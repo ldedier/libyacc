@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 07:52:40 by ldedier           #+#    #+#             */
-/*   Updated: 2019/11/29 08:54:22 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define MULTIPLY_HPP
 
 # include <iostream>
-# include "AbstractToken.hpp"
+# include "AbstractTerminal.hpp"
 
-class Multiply : public AbstractToken<int, int>
+class Multiply : public AbstractTerminal<int, int>
 {
 	public:
 		Multiply(void);
