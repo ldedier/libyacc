@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 01:32:46 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 17:45:15 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include <map>
+# include <deque>
 # include "AbstractLRAction.hpp"
 # include "LRState.hpp"
 # include "LRActionError.hpp"
@@ -22,6 +23,7 @@
 # include "LRActionShift.hpp"
 # include "LRActionAccept.hpp"
 # include "ASTBuilder.hpp"
+# include "StackItem.hpp"
 # include "Token.hpp"
 
 template<typename T, typename C>
@@ -33,7 +35,7 @@ class LRParser
 
 		}
 
-		LRParser(AbstractGrammar<T, C> & cfg) : _cfg(&cfg)
+		LRParser(AbstractGrammar<T, C> & cfg) : _cfg(&cfg) , _stateIndex(0)
 		{
 			LRState<T, C> *firstState;
 		
@@ -56,11 +58,26 @@ class LRParser
 			return *this;
 		}
 
-		ASTBuilder<T, C> parse(std::list<Token<T, C> *> &tokens)
+		ASTBuilder<T, C> parse(std::deque<Token<T, C> *> &tokens)
 		{
 			ASTBuilder<T, C> res;
-			(void)tokens;
-			return res;
+			LRState<T, C> *currentState;
+			AbstractLRAction<T, C> *action;
+			std::deque<StackItem<T, C>  *> stack;
+			Token<T, C> *currentToken;
+			stack.push_front(new StackItem<T, C>(*(_states[0])));
+			while (tokens.size() > 0)
+			{
+				currentToken = tokens.front();
+				currentState = stack.front()->getState();
+				// std::cout << *currentState;
+				action = _tables[currentState->getIndex()][currentToken->getTerminal()->getIndex()];
+				if (!(action->execute(tokens, stack)))
+					return (res);
+				std::cout << *action;
+				std::cout << *currentToken << std::endl;
+			}
+			throw std::exception();
 		}
 
 		~LRParser(void)
@@ -143,7 +160,7 @@ class LRParser
 		{
 			LRState<T, C> *newState;
 		
-			newState = new LRState<T, C>(*item.advance());
+			newState = new LRState<T, C>(*item.advance(), ++_stateIndex);
 			// std::cout << "on add" << *newState << "from" << item ;
 			_states.push_back(newState);
 			return newState;
@@ -372,5 +389,7 @@ class LRParser
 		AbstractLRAction<T, C> ***_tables;
 		std::vector <LRState<T, C> * > _states;
 		AbstractGrammar<T, C> *_cfg;
+		int								_stateIndex;
+
 };
 #endif

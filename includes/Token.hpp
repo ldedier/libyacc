@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/03 00:47:40 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 01:28:32 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 17:38:30 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ class Token
 			return *this;
 		}
 		
-		AbstractTerminal<T, C> *getTerminal() const
+		AbstractTerminal<T, C> *getTerminal()
 		{
 			return _terminal;
 		}
@@ -67,7 +67,7 @@ class Token
 };
 
 template<typename T, typename C>
-std::ostream &operator<<(std::ostream &o, Token<T, C> const &instance)
+std::ostream &operator<<(std::ostream &o, Token<T, C>  &instance)
 {
 	o << *(instance.getTerminal());
 	return o;

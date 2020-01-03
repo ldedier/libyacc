@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 15:08:14 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 01:30:57 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 17:03:16 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@
 #include "Token.hpp"
 #include <fstream>
 
-std::list<Token<int, int> *> lex(std::istream &stream, ArithmeticGrammar &cfg)
+std::deque<Token<int, int> *> lex(std::istream &stream, ArithmeticGrammar &cfg)
 {
 	char c;
 
-	std::list<Token<int, int> *> res;
+	std::deque<Token<int, int> *> res;
 	while (stream.get(c))
 	{
 		if (c == '\n')
@@ -46,9 +46,10 @@ int main(void)
 	ArithmeticGrammar ag;
 
 	LRParser<int, int> parser(ag);
-	std::list<Token<int, int> *> tokens;
+	std::deque<Token<int, int> *> tokens;
 
 	tokens = lex(std::cin, ag);
+	tokens.push_back(new Token<int, int>(*(ag.getTerminal("_EOI_"))));
 	try {
 		ASTBuilder<int, int> b = parser.parse(tokens);
 	}

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:23:18 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 17:38:11 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,20 @@ template<typename T, typename C>
 class AbstractTerminal;
 
 template<typename T, typename C>
+class Token;
+
+template<typename T, typename C>
 class ASTNode
 {
 	public:
 		ASTNode(void)
 		{
 			
+		}
+
+		ASTNode(Token<T, C> *token): _symbol(*token->getTerminal()), _token(token)
+		{
+
 		}
 
 		ASTNode(ASTNode<T, C> const &instance)
@@ -50,8 +58,8 @@ class ASTNode
 
 	private:
 		AbstractSymbol<T, C> & _symbol;
-		AbstractTerminal<T, C> * _token;
-		std::list<ASTNode<T, C> &> _children;
+		Token<T, C> * _token;
+		std::list<ASTNode<T, C> &> *_children;
 		ASTNode<T, C> *_parent;
 };
 // std::ostream &operator<<(std::ostream &o, ASTNode const &instance);

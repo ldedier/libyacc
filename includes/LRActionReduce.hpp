@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:30:29 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 00:00:33 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 17:18:47 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,13 @@ class LRActionReduce : public AbstractLRAction<T, C>
 		virtual std::string color(void) const
 		{
 			return YACC_YELLOW;
+		}
+
+		virtual bool execute(std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> & stack) const
+		{
+			(void)tokens;
+			(void)stack;
+			return 1;
 		}
 
 	private:

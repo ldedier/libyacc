@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 16:24:29 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class LRState
 			
 		}
 
-		LRState(AbstractGrammar<T, C> &cfg)
+		LRState(AbstractGrammar<T, C> &cfg): _index(0)
 		{
 			LRItem<T, C> *firstItem;
 		
@@ -33,7 +33,7 @@ class LRState
 			_items.push_back(firstItem);
 		}
 
-		LRState(LRItem<T, C> &item)
+		LRState(LRItem<T, C> &item, int index): _index(index)
 		{
 			_items.push_back(&item);
 		}
@@ -135,9 +135,13 @@ class LRState
 			_transitions.insert(std::pair <AbstractSymbol<T, C> *, LRState<T, C> *>(&symbol, &state));
 		}
 
-
+		int getIndex()
+		{
+			return _index;
+		}
 
 	private:
+		int							_index;
 		std::vector<LRItem<T, C> *> _items;
 		std::map<AbstractSymbol<T, C> *, LRState<T, C> *> _transitions;
 };

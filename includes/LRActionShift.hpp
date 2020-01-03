@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:31:04 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 00:01:33 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/03 17:56:50 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,21 @@ class LRActionShift : public AbstractLRAction<T, C>
 		virtual std::string color(void) const
 		{
 			return YACC_GREEN;
+		}
+
+		virtual bool execute(std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> & stack) const
+		{
+			Token<T, C> *token;
+			StackItem <T, C> *astBuilderItem;
+			StackItem <T, C> *stateItem;
+
+			token = tokens.front();
+			tokens.pop_front();
+			astBuilderItem = new StackItem<T, C>(token);
+			stateItem = new StackItem<T, C>(*_state);
+			stack.push_front(astBuilderItem);
+			stack.push_front(stateItem);
+			return (1);
 		}
 
 	private:
