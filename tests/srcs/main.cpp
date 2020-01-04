@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 15:08:14 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 17:03:16 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 03:13:42 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ int main(void)
 	tokens = lex(std::cin, ag);
 	tokens.push_back(new Token<int, int>(*(ag.getTerminal("_EOI_"))));
 	try {
-		ASTBuilder<int, int> b = parser.parse(tokens);
+		ASTBuilder<int, int> *b = parser.parse(tokens);
+		std::cout << *b << std::endl;
 	}
 	catch (std::exception e)
 	{

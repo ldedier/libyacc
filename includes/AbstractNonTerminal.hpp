@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:15:12 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 23:56:38 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 04:29:21 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,12 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 		virtual ~AbstractNonTerminal(void)
 		{
 			
+		}
+
+		void addProduction(AbstractGrammar<T, C> &cfg, int nbSymbols, std::string  *tbl, bool replacing)
+		{
+			Production<T, C> *prod = new Production<T, C>(*this, cfg, nbSymbols, tbl, replacing);
+			_productions.push_back(prod);
 		}
 
 		void addProduction(AbstractGrammar<T, C> &cfg, int nbSymbols, std::string  *tbl)

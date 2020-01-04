@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:29:58 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 17:57:02 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 01:58:58 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,12 @@ class LRActionAccept : public AbstractLRAction<T, C>
 			return YACC_ACCEPT;
 		}
 
-		virtual bool execute(std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> & stack) const
+		virtual bool execute(LRParser<T, C> &parser, std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> & stack) const
 		{
+			(void)parser;
 			(void)tokens;
 			(void)stack;
+			std::cout << "Syntaxically Correct !" << std::endl;
 			return (0);
 		}
 

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 18:21:18 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/30 01:19:17 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 04:47:52 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include <iostream>
 
-#include "AbstractNonTerminal.hpp"
 # include "ArithmeticGrammar.hpp"
 
 class Factor : public AbstractNonTerminal<int, int>

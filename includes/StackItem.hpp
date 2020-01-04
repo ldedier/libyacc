@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/03 15:33:34 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 17:38:36 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 03:04:04 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,11 @@ class StackItem
 			_itemUnion.builder = new ASTBuilder<T, C>(token);
 		}
 
+		StackItem(AbstractNonTerminal<T, C> *nonTerminal) : _type(E_STACK_ITEM_AST_BUILDER)
+		{
+			_itemUnion.builder = new ASTBuilder<T, C>(nonTerminal);
+		}
+
 		StackItem(StackItem const &instance)
 		{
 			*this = instance;
@@ -78,7 +83,7 @@ class StackItem
 			return _itemUnion.builder;
 		}
 
-		LRState<T, C> getType()
+		t_stackItemType getType()
 		{
 			return _type;
 		}
@@ -89,9 +94,17 @@ class StackItem
 };
 
 template<typename T, typename C>
-std::ostream &operator<<(std::ostream &o, StackItem<T, C> const &instance)
+std::ostream &operator<<(std::ostream &o, StackItem<T, C>  &instance)
 {
 	static_cast<void>(instance);
+	if (instance.getType() == E_STACK_ITEM_AST_BUILDER)
+	{
+		o << *instance.getASTBuilder();
+	}
+	else
+	{
+		o << *instance.getState();
+	}	
 	return o;
 }
 #endif

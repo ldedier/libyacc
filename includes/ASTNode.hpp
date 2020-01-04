@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:23:18 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 17:38:11 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 05:47:48 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,11 @@
 template<typename T, typename C>
 class AbstractSymbol;
 
+// template<typename T, typename C>
+// class AbstractTerminal;
+
 template<typename T, typename C>
-class AbstractTerminal;
+class AbstractNonTerminal;
 
 template<typename T, typename C>
 class Token;
@@ -36,6 +39,11 @@ class ASTNode
 		}
 
 		ASTNode(Token<T, C> *token): _symbol(*token->getTerminal()), _token(token)
+		{
+
+		}
+
+		ASTNode(AbstractNonTerminal<T, C> *nonTerminal): _symbol(*nonTerminal), _token(nullptr)
 		{
 
 		}
@@ -56,11 +64,57 @@ class ASTNode
 			
 		}
 
+		void addChildFront(ASTNode<T, C> *node)
+		{
+			node->_parent = this;
+			_children.push_front(node);
+		}
+
+		void addChildBack(ASTNode<T, C> *node)
+		{
+			node->_parent = this;
+			_children.push_back(node);
+		}
+
+		void debug(std::ostream &o, size_t depth)
+		{
+			typename std::list<ASTNode<T, C> *>::iterator it = _children.begin();
+
+			int i = 0;
+			int j = 0;
+			o << _symbol << std::endl;
+			i = 1;
+			while (it != _children.end())
+			{
+				j = 0;
+				while (j < (int)depth)
+				{
+					o << "| ";
+					j++;
+				}
+				o << "o child #" << i++  << " : ";
+				(*it)->debug(o, depth + 1);
+				it++;
+			} 
+		}
+
+		AbstractSymbol<T, C> & getSymbol()
+		{
+			return _symbol;
+		}
+
 	private:
 		AbstractSymbol<T, C> & _symbol;
 		Token<T, C> * _token;
-		std::list<ASTNode<T, C> &> *_children;
+		std::list<ASTNode<T, C> *> _children;
 		ASTNode<T, C> *_parent;
 };
-// std::ostream &operator<<(std::ostream &o, ASTNode const &instance);
+
+
+template<typename T, typename C>
+std::ostream &operator<<(std::ostream &o, ASTNode<T, C>  &instance)
+{
+	instance.debug(o, 0);
+	return o;
+}
 #endif

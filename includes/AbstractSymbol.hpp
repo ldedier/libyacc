@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 06:48:30 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/02 23:07:32 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 01:18:52 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,12 @@ class AbstractSymbol
 			
 		}
 
-		AbstractSymbol(std::string identifier): _identifier(identifier)
+		AbstractSymbol(std::string identifier): _identifier(identifier), _relevant(true)
+		{
+			
+		}
+
+		AbstractSymbol(std::string identifier, bool relevant): _identifier(identifier), _relevant(relevant)
 		{
 			
 		}
@@ -82,6 +87,11 @@ class AbstractSymbol
 			_index = index;
 		}
 
+		bool isRelevant()
+		{
+			return _relevant;
+		}
+
 		void printFirstSet()
 		{
 			std::cout << *this << ":" << std::endl;
@@ -97,6 +107,7 @@ class AbstractSymbol
 	private:
 		std::string _identifier;
 		int			_index;
+		bool		_relevant;
 	protected:
 		Set<T, C> _firstSet;
 };

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:48:51 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 17:35:20 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 04:25:00 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,11 @@ class ASTBuilder
 
 		}
 
+		ASTBuilder(AbstractNonTerminal<T, C> *nonTerminal) : _astRoot(new ASTNode<T, C>(nonTerminal)), _cstRoot(new ASTNode<T, C>(nonTerminal))
+		{
+
+		}
+
 		ASTBuilder(ASTBuilder const &instance)
 		{
 			*this = instance;
@@ -49,10 +54,35 @@ class ASTBuilder
 			
 		}
 
+		ASTNode<T, C> *getASTRoot()
+		{
+			return _astRoot;
+		}
+
+		ASTNode<T, C> *getCSTRoot()
+		{
+			return _cstRoot;
+		}
+
+		void setASTRoot(ASTNode<T, C> *astRoot)
+		{
+			_astRoot = astRoot;
+		}
+
+
 	private:
 		ASTNode<T, C> * _astRoot;
 		ASTNode<T, C> * _cstRoot;
 };
 
-// std::ostream &operator<<(std::ostream &o, ASTBuilder const &instance);
+template<typename T, typename C>
+std::ostream &operator<<(std::ostream &o, ASTBuilder<T, C>  &instance)
+{
+	o << "AST:" << std::endl;
+	o << *(instance.getASTRoot()) << std::endl;
+
+	o << "CST:" << std::endl;
+	o << *(instance.getCSTRoot())<< std::endl;
+	return o;
+}
 #endif

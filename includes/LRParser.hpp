@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 17:45:15 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 03:12:56 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ class LRParser
 			return *this;
 		}
 
-		ASTBuilder<T, C> parse(std::deque<Token<T, C> *> &tokens)
+		ASTBuilder<T, C> *parse(std::deque<Token<T, C> *> &tokens)
 		{
 			ASTBuilder<T, C> res;
 			LRState<T, C> *currentState;
@@ -72,10 +72,21 @@ class LRParser
 				currentState = stack.front()->getState();
 				// std::cout << *currentState;
 				action = _tables[currentState->getIndex()][currentToken->getTerminal()->getIndex()];
-				if (!(action->execute(tokens, stack)))
-					return (res);
-				std::cout << *action;
-				std::cout << *currentToken << std::endl;
+				if (!(action->execute(*this, tokens, stack)))
+				{
+					// size_t j;
+				
+					// j = 0;
+					// while (j < stack.size())
+					// {
+						// std::cout << *(stack[j++]);
+						return (stack[1])->getASTBuilder();
+					// }
+					// std::cout << stack.size() << std::endl;
+					// return (res);
+				}
+				// std::cout << *action;
+				// std::cout << *currentToken << std::endl;
 			}
 			throw std::exception();
 		}
@@ -383,6 +394,11 @@ class LRParser
 				computeShift(*currentState, i);
 				i++;
 			}
+		}
+
+		AbstractLRAction<T, C> ***getTables()
+		{
+			return _tables;
 		}
 
 	private:
