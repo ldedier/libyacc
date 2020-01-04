@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:29:58 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 22:05:43 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/05 00:03:38 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ class LRActionAccept : public AbstractLRAction<T, C>
 			(void)it;
 			(void)stack;
 			(void)rootItem;
-			std::cout << "Syntaxically Correct !" << std::endl;
 			return (0);
 		}
 

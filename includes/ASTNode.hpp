@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:23:18 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 23:17:28 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 23:54:16 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define ASTNODE_HPP
 
 # include <iostream>
+# include <deque>
 # include <list>
 // # include "AbstractSymbol.hpp"
 
@@ -61,7 +62,7 @@ class ASTNode
 
 		virtual ~ASTNode(void)
 		{
-			typename std::list<ASTNode<T, C> *>::iterator it = _children.begin();
+			typename std::deque<ASTNode<T, C> *>::iterator it = _children.begin();
 		
 			while (it != _children.end())
 			{
@@ -84,7 +85,7 @@ class ASTNode
 
 		void debug(std::ostream &o, size_t depth)
 		{
-			typename std::list<ASTNode<T, C> *>::iterator it = _children.begin();
+			typename std::deque<ASTNode<T, C> *>::iterator it = _children.begin();
 
 			int i = 0;
 			int j = 0;
@@ -117,10 +118,35 @@ class ASTNode
 			return _parent;
 		}
 
+		std::deque<ASTNode<T, C> *> &getChildren(void)
+		{
+			return _children;
+		}
+
+		ASTNode<T, C> * getChild(int index)
+		{
+			return _children[index];
+		}
+
+		std::string getChildIdentifier(int index)
+		{
+			return _children[index]->getSymbol().getIdentifier();
+		}
+
+		T getTraversed(C context)
+		{
+			return _symbol.traverse(*this, context);
+		}
+
+		Token<T, C> *getToken()
+		{
+			return _token;
+		}
+
 	private:
 		AbstractSymbol<T, C> & _symbol;
 		Token<T, C> * _token;
-		std::list<ASTNode<T, C> *> _children;
+		std::deque<ASTNode<T, C> *> _children;
 		ASTNode<T, C> *_parent;
 };
 
