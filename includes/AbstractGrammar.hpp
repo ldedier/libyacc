@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 01:14:41 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 18:13:37 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 # define ABSTRACTGRAMMAR_HPP
 
 # include <iostream>
+# include <deque>
 # include "AbstractSymbol.hpp"
 # include "AbstractTerminal.hpp"
 # include "AbstractNonTerminal.hpp"
 # include "Start.hpp"
 # include "EndOfInput.hpp"
+# include "Token.hpp"
 
 template<typename T, typename C>
 class AbstractGrammar
@@ -47,8 +49,57 @@ class AbstractGrammar
 		}
 
 		virtual ~AbstractGrammar(void)
+		{			
+			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _symbolsMap.begin();
+
+			while (it != _symbolsMap.end())
+			{
+				delete it->second;
+				it++;
+			}
+			delete _startSymbol;
+		}
+
+		void debugGrammar()
 		{
-			
+			typename std::vector<AbstractNonTerminal<T, C> * >::iterator it = _nonTerminals.begin();
+
+			std::cout << "Productions: " << std::endl << std::endl;
+			_startSymbol->printProductions();
+			while (it != _nonTerminals.end())
+			{
+				(*it)->printProductions();
+				it++;
+			}
+			std::cout << "First Sets: " << std::endl << std::endl;
+			it = _nonTerminals.begin();
+			while (it != _nonTerminals.end())
+			{
+				(*it)->printFirstSet();
+				it++;
+			}
+		}
+
+	public:
+
+		AbstractNonTerminal<T, C> * getGrammarStartingSymbol()
+		{
+			return _startGrammarSymbol;
+		}
+
+		EndOfInput<T, C> * getEndOfInput()
+		{
+			return _endOfInput;
+		}
+
+		Start<T, C> * getStartingSymbol()
+		{
+			return _startSymbol;
+		}
+
+		std::map<std::string, AbstractSymbol<T, C> *> &getSymbolsMap()
+		{
+			return _symbolsMap;
 		}
 
 		AbstractSymbol<T, C> *getSymbol(std::string identifier)
@@ -85,52 +136,15 @@ class AbstractGrammar
 			}
 		}
 
-		void debugGrammar()
+		std::deque<Token<T, C> *> lex(std::istream & istream)
 		{
-			typename std::vector<AbstractNonTerminal<T, C> * >::iterator it = _nonTerminals.begin();
+			std::deque<Token<T, C> *> res;
 
+			res = innerLex(istream);
+			res.push_back(new Token<T, C>(*(getTerminal("_EOI_"))));
+			return res;
+		}
 		
-			std::cout << "Productions: " << std::endl << std::endl;
-
-			_startSymbol->printProductions();
-			
-			while (it != _nonTerminals.end())
-			{
-				(*it)->printProductions();
-				it++;
-			}
-
-			std::cout << "First Sets: " << std::endl << std::endl;
-			it = _nonTerminals.begin();
-			while (it != _nonTerminals.end())
-			{
-				(*it)->printFirstSet();
-				it++;
-			}
-		}
-
-	public:
-
-		AbstractNonTerminal<T, C> * getGrammarStartingSymbol()
-		{
-			return _startGrammarSymbol;
-		}
-
-		EndOfInput<T, C> * getEndOfInput()
-		{
-			return _endOfInput;
-		}
-
-		Start<T, C> * getStartingSymbol()
-		{
-			return _startSymbol;
-		}
-
-		std::map<std::string, AbstractSymbol<T, C> *> &getSymbolsMap()
-		{
-			return _symbolsMap;
-		}
-
 	protected:
 
 		void addNonTerminal(AbstractNonTerminal<T, C> * nonTerminal)
@@ -237,17 +251,35 @@ class AbstractGrammar
 			_symbolsMap.insert(std::pair <std::string, AbstractSymbol<T, C> *>(symbol->getIdentifier(), symbol));
 		}
 
-		virtual void fillGrammar() = 0;
+		void computeGrammar(void)
+		{
+			computeProductions();
+			computeFirstSets();
+			// debugGrammar();
+		}
+
+		virtual std::deque<Token<T, C> *> innerLex(std::istream & istream) = 0;
 
 		Start<T, C>										* _startSymbol;
 		AbstractNonTerminal<T, C>						* _startGrammarSymbol;
 		EndOfInput<T, C>								* _endOfInput;
 		int												_index;
 		std::vector<AbstractNonTerminal<T, C> *>		_nonTerminals;
-		std::vector<AbstractTerminal<T, C> *>				_tokens;
+		std::vector<AbstractTerminal<T, C> *>			_tokens;
 		std::map<std::string, AbstractSymbol<T, C> *>	_symbolsMap;
 
 };
+
+template<typename T, typename C>
+void deleteTokens(std::deque<Token<T, C> *> &tokens)
+{
+	typename std::deque<Token<T, C> *>::iterator it = tokens.begin();
+	while (it != tokens.end())
+	{
+		delete *it;
+		it++;
+	}
+}
 
 // std::ostream &operator<<(std::ostream &o, AbstractGrammar const &instance);
 #endif

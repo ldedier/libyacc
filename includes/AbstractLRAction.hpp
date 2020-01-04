@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:28:41 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 01:48:07 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 22:06:00 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ class StackItem;
 
 template<typename T, typename C>
 class LRState;
+
+template<typename T, typename C>
+class StackItem;
 
 template<typename T, typename C>
 class LRParser;
@@ -55,7 +58,8 @@ class AbstractLRAction
 
 		virtual std::string repr(void) const = 0;
 		virtual std::string color(void) const = 0;
-		virtual bool execute(LRParser<T, C> &parser, std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> &stack) const = 0;
+		virtual bool execute(LRParser<T, C> &parser, typename std::deque<Token<T, C> *>::iterator &it,
+			std::deque<StackItem<T, C> *> &stack, StackItem<T, C> **rootItem) const = 0;
 
 	private:
 

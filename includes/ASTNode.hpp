@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:23:18 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 05:47:48 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 23:17:28 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,17 @@ template<typename T, typename C>
 class ASTNode
 {
 	public:
-		ASTNode(void)
+		ASTNode(void): _parent(nullptr)
 		{
 			
 		}
 
-		ASTNode(Token<T, C> *token): _symbol(*token->getTerminal()), _token(token)
+		ASTNode(Token<T, C> *token): _symbol(*token->getTerminal()), _token(token), _parent(nullptr)
 		{
 
 		}
 
-		ASTNode(AbstractNonTerminal<T, C> *nonTerminal): _symbol(*nonTerminal), _token(nullptr)
+		ASTNode(AbstractNonTerminal<T, C> *nonTerminal): _symbol(*nonTerminal), _token(nullptr), _parent(nullptr)
 		{
 
 		}
@@ -61,7 +61,13 @@ class ASTNode
 
 		virtual ~ASTNode(void)
 		{
-			
+			typename std::list<ASTNode<T, C> *>::iterator it = _children.begin();
+		
+			while (it != _children.end())
+			{
+				delete *it;
+				it++;
+			}
 		}
 
 		void addChildFront(ASTNode<T, C> *node)
@@ -82,7 +88,10 @@ class ASTNode
 
 			int i = 0;
 			int j = 0;
-			o << _symbol << std::endl;
+			if (_token)
+				o << *_token << std::endl;
+			else
+				o << _symbol << std::endl;
 			i = 1;
 			while (it != _children.end())
 			{
@@ -101,6 +110,11 @@ class ASTNode
 		AbstractSymbol<T, C> & getSymbol()
 		{
 			return _symbol;
+		}
+
+		ASTNode<T, C> *getParent()
+		{
+			return _parent;
 		}
 
 	private:

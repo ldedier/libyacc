@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:41 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 16:24:29 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 15:53:31 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,12 @@ class LRState
 
 		virtual ~LRState(void)
 		{
-			
+			typename std::vector<LRItem<T, C> *>::iterator it = _items.begin();
+			while (it != _items.end())
+			{
+				delete *it;
+				it++;
+			}
 		}
 
 		void addNewItem(Production<T,C> &production, AbstractTerminal<T, C> &lookahead)

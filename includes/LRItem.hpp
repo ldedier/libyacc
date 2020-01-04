@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:08:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 17:43:35 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,10 @@ class LRItem
 
 	private:
 
-		bool					_isParsed;
-		Production<T, C> &		_production;
-		AbstractTerminal<T, C> &	_lookahead;
-		typename std::vector<AbstractSymbol<T, C> *>::const_iterator  _progress;
+		bool															_isParsed;
+		Production<T, C> &												_production;
+		AbstractTerminal<T, C> 											&_lookahead;
+		typename std::vector<AbstractSymbol<T, C> *>::const_iterator	_progress;
 };
 
 template<typename T, typename C>

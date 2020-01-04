@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:31:04 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 04:48:02 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 22:54:06 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,15 +54,17 @@ class LRActionShift : public AbstractLRAction<T, C>
 			return YACC_GREEN;
 		}
 
-		virtual bool execute(LRParser<T, C> &parser, std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> & stack) const
+		virtual bool execute(LRParser<T, C> &parser, typename std::deque<Token<T, C> *>::iterator &it,
+			std::deque<StackItem<T, C> *> & stack, StackItem<T, C> **rootItem) const
 		{
 			Token<T, C> *token;
 			StackItem <T, C> *astBuilderItem;
 			StackItem <T, C> *stateItem;
 
 			(void)parser;
-			token = tokens.front();
-			tokens.pop_front();
+			(void)rootItem;
+			token = *it;
+			it++;
 			astBuilderItem = new StackItem<T, C>(token);
 			stateItem = new StackItem<T, C>(*_state);
 			stack.push_front(astBuilderItem);
@@ -74,9 +76,8 @@ class LRActionShift : public AbstractLRAction<T, C>
 		{
 			return *_state;
 		}
+
 	private:
 		LRState<T, C> *_state;
 };
-
-// std::ostream &operator<<(std::ostream &o, LRActionShift const &instance);
 #endif

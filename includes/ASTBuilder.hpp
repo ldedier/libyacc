@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:48:51 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 04:25:00 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 21:47:10 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ class ASTBuilder
 		
 		virtual ~ASTBuilder(void)
 		{
-			
+			delete _astRoot;
+			delete _cstRoot;
 		}
 
 		ASTNode<T, C> *getASTRoot()
@@ -68,7 +69,6 @@ class ASTBuilder
 		{
 			_astRoot = astRoot;
 		}
-
 
 	private:
 		ASTNode<T, C> * _astRoot;

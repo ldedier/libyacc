@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/28 19:03:16 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 00:46:07 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 16:52:02 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class Set
 		Set(AbstractGrammar<T, C> &grammar,
 			typename std::vector<AbstractSymbol<T, C> *>::const_iterator &it,
 				const std::vector<AbstractSymbol<T, C> *> & symbols,
-					AbstractTerminal<T, C> &lookahead)
+					AbstractTerminal<T, C> &lookahead) : _hasEpsilon(false)
 		{
 			AbstractSymbol<T, C> *symbol;
 			(void)grammar;

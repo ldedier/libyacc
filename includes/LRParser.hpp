@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 03:12:56 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 23:17:15 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class LRParser
 			while (computeAllStates())
 				;
 			computeTables();
-			this->debug();
+			// this->debug();
 		}
 
 		LRParser(LRParser const &instance)
@@ -58,42 +58,97 @@ class LRParser
 			return *this;
 		}
 
+		void clearStack(std::deque<StackItem<T, C> *> &stack)
+		{
+			typename std::deque<StackItem<T, C>  *>::iterator it = stack.begin();
+			while (it != stack.end())
+			{
+				operator delete ((*it));
+				it++;
+			}
+		}
+
+		void clearStackCheckOrphans(std::deque<StackItem<T, C> *> &stack, ASTBuilder<T, C> *root)
+		{
+			typename std::deque<StackItem<T, C>  *>::iterator it = stack.begin();
+			while (it != stack.end())
+			{
+				if ((*it)->getType() == E_STACK_ITEM_AST_BUILDER
+					&& (*it)->getASTBuilder()->getCSTRoot()->getParent() == nullptr
+					&& (*it)->getASTBuilder() != root)
+				{
+					delete (*it)->getASTBuilder();
+				}
+				operator delete(*it);
+				it++;
+			}
+		}
+
 		ASTBuilder<T, C> *parse(std::deque<Token<T, C> *> &tokens)
 		{
-			ASTBuilder<T, C> res;
-			LRState<T, C> *currentState;
-			AbstractLRAction<T, C> *action;
-			std::deque<StackItem<T, C>  *> stack;
-			Token<T, C> *currentToken;
+			LRState<T, C>					*currentState;
+			AbstractLRAction<T, C>			*action;
+			std::deque<StackItem<T, C> *>	stack;
+			Token<T, C>						*currentToken;
+			StackItem<T, C>					*rootItem;
+			typename std::deque<Token<T, C> *>::iterator it = tokens.begin();
+			ASTBuilder<T, C >				*res;
+		
+			rootItem = nullptr;
 			stack.push_front(new StackItem<T, C>(*(_states[0])));
-			while (tokens.size() > 0)
+			while (it != tokens.end())
 			{
-				currentToken = tokens.front();
+				currentToken = *it;
 				currentState = stack.front()->getState();
-				// std::cout << *currentState;
 				action = _tables[currentState->getIndex()][currentToken->getTerminal()->getIndex()];
-				if (!(action->execute(*this, tokens, stack)))
+				try
 				{
-					// size_t j;
-				
-					// j = 0;
-					// while (j < stack.size())
-					// {
-						// std::cout << *(stack[j++]);
-						return (stack[1])->getASTBuilder();
-					// }
-					// std::cout << stack.size() << std::endl;
-					// return (res);
+					if (!(action->execute(*this, it, stack, &rootItem)))
+					{
+						res = rootItem->getASTBuilder();
+						clearStack(stack);
+						return res;
+					}
 				}
-				// std::cout << *action;
-				// std::cout << *currentToken << std::endl;
+				catch (const std::exception& e)
+				{
+					if (rootItem)
+						res = rootItem->getASTBuilder();
+					else
+						res = nullptr;
+					clearStackCheckOrphans(stack, res);
+					delete res;
+					std::cerr << e.what() << std::endl;
+					throw std::exception();
+				}
 			}
 			throw std::exception();
 		}
 
 		~LRParser(void)
 		{
+			size_t i = 0;
+			size_t j;
 
+			while (i < _states.size())
+			{
+				j = 0;
+				while (j < _cfg->getSymbolsMap().size())
+				{
+					delete _tables[i][j];
+					j++;
+				}
+				delete[] _tables[i];
+				i++;
+			}
+			delete[] _tables;
+
+			typename std::vector<LRState<T, C> *>::iterator it = _states.begin();
+			while (it != _states.end())
+			{
+				delete *it;
+				it++;
+			}
 		}
 
 		void debug()
@@ -402,9 +457,9 @@ class LRParser
 		}
 
 	private:
-		AbstractLRAction<T, C> ***_tables;
-		std::vector <LRState<T, C> * > _states;
-		AbstractGrammar<T, C> *_cfg;
+		AbstractLRAction<T, C>			 ***_tables;
+		std::vector <LRState<T, C> * >	_states;
+		AbstractGrammar<T, C>			*_cfg;
 		int								_stateIndex;
 
 };

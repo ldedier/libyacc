@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 06:48:30 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 01:18:52 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 20:35:43 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # define YACC_EOC	"\033[0m"                                                   
 # define YACC_BLUE	"\x1B[34m"
 # define YACC_RED	"\x1B[31m"
-# define YACC_GREEN	"\x1B[33m"
-# define YACC_YELLOW	"\x1B[32m"
+# define YACC_GREEN	"\x1B[32m"
+# define YACC_YELLOW	"\x1B[33m"
 # define YACC_ACCEPT	"\x1B[35m"
 
 template<typename T, typename C>

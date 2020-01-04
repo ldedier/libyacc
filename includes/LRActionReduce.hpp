@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:30:29 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 05:47:44 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 22:24:56 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,45 +59,50 @@ class LRActionReduce : public AbstractLRAction<T, C>
 			return YACC_YELLOW;
 		}
 
-		virtual bool execute(LRParser<T, C> &parser, std::deque<Token<T, C> *> &tokens, std::deque<StackItem<T, C> *> & stack) const
+		virtual bool execute(LRParser<T, C> &parser, typename std::deque<Token<T, C> *>::iterator &tokens_it,
+			std::deque<StackItem<T, C> *> & stack, StackItem<T, C> **rootItem) const
 		{
-			size_t size;
-			size_t i;
-			StackItem<T, C> *astBuilderItem;
+			size_t			size;
+			size_t			i;
+			StackItem<T, C> *parentASTBuilderItem;
 			StackItem<T, C> *stateItem;
 			StackItem<T, C> *goalStateItem;
 			ASTNode<T, C> *replacingASTNode;
 			std::list<ASTNode<T, C>* > childs; 
-
 			typename std::list<ASTNode<T, C > * >::iterator it;
-
-			(void)tokens;
-			astBuilderItem = new StackItem<T, C>(_production->getFrom());
+			// std::cout << "before reduce" << std::endl;
+			// getchar();
+			(void)tokens_it;
+			parentASTBuilderItem = new StackItem<T, C>(_production->getFrom());
 			size = _production->getSymbols().size();
 			i = 0;
 			while (i < size)
 			{
-				popReduce(astBuilderItem, stack, childs);
+				popReduce(parentASTBuilderItem, stack, childs);
 				i++;
 			}			
 			if (_production->isReplacing())
 			{
 				replacingASTNode = childs.front();
 				childs.pop_front();
-				delete astBuilderItem->getASTBuilder()->getASTRoot();
-				// std::cout << "ref became: " << *(childBuilderItem->getASTBuilder()->getASTRoot());
-				astBuilderItem->getASTBuilder()->setASTRoot((replacingASTNode));
+				delete parentASTBuilderItem->getASTBuilder()->getASTRoot();
+				parentASTBuilderItem->getASTBuilder()->setASTRoot((replacingASTNode));
+			
 			}
 			it = childs.begin();
 			while (it != childs.end())
 			{
-				astBuilderItem->getASTBuilder()->getASTRoot()->addChildFront(*it);
+				parentASTBuilderItem->getASTBuilder()->getASTRoot()->addChildBack(*it);
 				it++;
 			}
 			stateItem = stack.front();
 			LRActionShift<T, C> *shiftAction = dynamic_cast<LRActionShift<T, C> *>(parser.getTables()[stateItem->getState()->getIndex()][_production->getFrom()->getIndex()]);
 			goalStateItem = new StackItem<T, C>(shiftAction->getState());
-			stack.push_front(astBuilderItem);
+			
+			*rootItem = parentASTBuilderItem;
+			stack.push_front(parentASTBuilderItem); //LEAKS HERE
+			// std::cout << "after reduce" << std::endl;
+			// getchar();
 			stack.push_front(goalStateItem);
 			return (1);
 		}
@@ -110,34 +115,23 @@ class LRActionReduce : public AbstractLRAction<T, C>
 			StackItem<T, C> *childBuilderItem;
 		
 			stateItem = stack.front();
-			delete stateItem;
+			delete (stateItem);
 			stack.pop_front();
 			childBuilderItem = stack.front();
 			stack.pop_front();
 			
 			parentItem->getASTBuilder()->getCSTRoot()->addChildFront(childBuilderItem->getASTBuilder()->getCSTRoot());
 
-			(void)index;
 			if (childBuilderItem->getASTBuilder()->getASTRoot()->getSymbol().isRelevant())
-			{
-				// if (_production->isReplacing())
-				// {
-				// 	std::cout << *_production << std::endl;
-				// 	// std::cout << parentItem->getASTBuilder()->getASTRoot()->getSymbol() << std::endl;
-				// 	delete parentItem->getASTBuilder()->getASTRoot();
-				// 	std::cout << "ref became: " << *(childBuilderItem->getASTBuilder()->getASTRoot());
-				// 	parentItem->getASTBuilder()->setASTRoot((childBuilderItem->getASTBuilder()->getASTRoot()));
-				// }
-				// else
-				// 	parentItem->getASTBuilder()->getASTRoot()->addChildFront(childBuilderItem->getASTBuilder()->getASTRoot());
 				childs.push_front(childBuilderItem->getASTBuilder()->getASTRoot());
-			}
 			else
+			{
 				delete childBuilderItem->getASTBuilder()->getASTRoot();
+				childBuilderItem->getASTBuilder()->setASTRoot(nullptr);
+			}
+			delete childBuilderItem;
 		}
 
 		Production<T, C> *_production;
 };
-
-// std::ostream &operator<<(std::ostream &o, LRActionReduce const &instance);
 #endif

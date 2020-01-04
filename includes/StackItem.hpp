@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/03 15:33:34 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 03:04:04 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 21:46:52 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,19 @@ class StackItem
 
 		StackItem(LRState<T, C> &state) : _type(E_STACK_ITEM_STATE)
 		{
+			// std::cout << "from state: " << this << std::endl;
 			_itemUnion.state = &state;
 		}
 
 		StackItem(ASTBuilder<T, C> &astBuilder) : _type(E_STACK_ITEM_AST_BUILDER)
 		{
+			// std::cout << "from astBuilder: " << this << std::endl;
 			_itemUnion.builder = &astBuilder;
 		}
 
 		StackItem(Token<T, C> *token) : _type(E_STACK_ITEM_AST_BUILDER)
 		{
+			// std::cout << "from token: " << this << "(" <<  *token << ")" << std::endl;
 			_itemUnion.builder = new ASTBuilder<T, C>(token);
 		}
 
@@ -70,7 +73,8 @@ class StackItem
 
 		virtual ~StackItem(void)
 		{
-
+			if (_type == E_STACK_ITEM_AST_BUILDER)
+				operator delete(_itemUnion.builder);
 		}
 
 		LRState<T, C> * getState()
@@ -99,10 +103,12 @@ std::ostream &operator<<(std::ostream &o, StackItem<T, C>  &instance)
 	static_cast<void>(instance);
 	if (instance.getType() == E_STACK_ITEM_AST_BUILDER)
 	{
+		o << "AST ITEM:" << std::endl;
 		o << *instance.getASTBuilder();
 	}
 	else
 	{
+		o << "STATE ITEM:" << std::endl;
 		o << *instance.getState();
 	}	
 	return o;

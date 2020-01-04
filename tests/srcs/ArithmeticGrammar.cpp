@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 09:57:18 by ldedier           #+#    #+#             */
-/*   Updated: 2019/12/29 18:07:26 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/04 16:00:12 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,32 @@ ArithmeticGrammar::ArithmeticGrammar(void) : AbstractGrammar(new Arithmetic())
 	addToken(new Multiply());
 	addToken(new Divide());
 
-	computeProductions();
-	computeFirstSets();
-	debugGrammar();
+	computeGrammar();
 }
 
-void ArithmeticGrammar::fillGrammar(void) 
+std::deque<Token<int, int> *> ArithmeticGrammar::innerLex(std::istream & istream)
 {
+	char c;
 
+	std::deque<Token<int, int> *> res;
+	while (istream.get(c))
+	{
+		if (c == '\n')
+			return res;
+		if (c == '+')
+			res.push_back(new Token<int, int>(*(getTerminal("+"))));
+		else if (c == '*')
+			res.push_back(new Token<int, int>(*(getTerminal("*"))));
+		else if (c == '/')
+			res.push_back(new Token<int, int>(*(getTerminal("/"))));
+		else if (c == '-')
+			res.push_back(new Token<int, int>(*(getTerminal("-"))));
+		else if (isdigit(c))
+			res.push_back(new Token<int, int>(*(getTerminal("integer")), c - '0'));
+		else if (!isspace(c))
+			throw std::exception();
+	}
+	return (res);
 }
 
 ArithmeticGrammar::ArithmeticGrammar(ArithmeticGrammar const &instance)
