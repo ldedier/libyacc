@@ -62,8 +62,6 @@ ifeq ($(DEBUG), 1)
 	CFLAGS += -fsanitize=address
 	CC += -g3
 endif
-	
-SPEED = -j8
 
 all: $(NAME)
 

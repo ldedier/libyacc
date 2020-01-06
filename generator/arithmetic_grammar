@@ -1,9 +1,35 @@
-arithmetic          : and_or
-|                    EPS
+%prefix Term
+
+%tokens
+
+>   Greater
+>=  GreaterOrEqual
+<   Lesser
+<=  LesserOrEqual
+&&  And
+||  Or
+!=  NotEqual
+==  Equal
+*   Multiply
+/   Divide
+%   Modulo
+-   Minus
++   Plus
+INC Inc
+DEC Dec
+INTEGER    Integer   int
+VARIABLE   Variable  string
+
+%nonterminals
+
+%start arithmetic
+
+arithmetic          : AndOr
+|                    _EPS_
 ;
-and_or : comparison
-|        and_or && comparison
-|        and_or || comparison
+AndOr : comparison
+|        AndOr && comparison
+|        AndOr || comparison
 ;
 comparison : expr
 |        comparison > expr
