@@ -21,13 +21,21 @@ class ParserGenerator:
 		self.path = path;
 		self.grammar_fd = open(path, "r");
 		self.grammar = Grammar(self.grammar_fd);
+
+	def generateHeaders(self):
+		print("generated Headers !");
+
+    def generateSources(self):
+    	print("generated sources !");
+
+	def generateMakefile(self):
+		print("generated Makefile !");
 	
 	def generateCode(self):
 		print(self.grammar);
-
-		#srcs
-		#includes
-		#makefile
+		self.generateHeaders();
+		self.generateSources();
+		self.generateMakefile();
 
 
 if len(sys.argv) >= 2:

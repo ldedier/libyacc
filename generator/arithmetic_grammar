@@ -1,6 +1,7 @@
 %prefix Term
 %grammarName ArithmeticGrammar
-%folder .
+
+#%folder .
 
 %tokens
 
