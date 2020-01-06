@@ -32,6 +32,8 @@ class Grammar:
 			res += self.symbols[string].__repr__() + "\n";
 		res += "starting symbol: " + self.startSymbol.identifier + "\n";
 		res += "Prefix: \"" + self.prefix + "\"\n";
+		res += "name: \"" + self.name + "\"\n";
+		res += "folder: \"" + self.folder + "\"\n";
 		return res;
 	
 	def __init__(self, fd):
@@ -41,6 +43,8 @@ class Grammar:
 		self.terminalRoles = {};
 		self.startSymbol = None;
 		self.prefix = "";
+		self.name = "MyConcreteGrammar";
+		self.folder = "../..";
 		self.fillGrammar(fd);
 
 	def parseTokens(self, line):
@@ -86,8 +90,13 @@ class Grammar:
 				break ;
 			else:
 				split = Grammar.smartSplit(line);
-				if (len(split) == 2 and split[0] == "%prefix"):
-					self.prefix = split[1];
+				if (len(split) == 2):
+					if split[0] == "%prefix":
+						self.prefix = split[1];
+					elif split[0] == "%grammarName":
+						self.name = split[1];
+					elif split[0] == "%folder":
+						self.folder = split[1];
 		for line in fd:
 			if line == "%nonterminals\n":
 				break ;

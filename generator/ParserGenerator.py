@@ -25,6 +25,11 @@ class ParserGenerator:
 	def generateCode(self):
 		print(self.grammar);
 
+		#srcs
+		#includes
+		#makefile
+
+
 if len(sys.argv) >= 2:
 	path = sys.argv[1]
 else:
