@@ -23,7 +23,7 @@ class Symbol:
 	@staticmethod
 	def capitalizeCustom(string):
 		if (len(string) > 0):
-			res = string[0].lower() + string[1:];
+			res = string[0].upper() + string[1:];
 		else:
 			res = string[:];
 		return res;

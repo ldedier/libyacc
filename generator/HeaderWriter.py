@@ -20,7 +20,8 @@ class HeaderWriter:
 
 	@classmethod
 	def writeHeader(HeaderWriter, fd, name):
-
+		split = name.split("/");
+		name = split[len(split) - 1];
 		name = name[:40];
 		time = datetime.today().strftime('%Y/%m/%d %H:%M:%S') + " by " + HeaderWriter.login;
 		by = HeaderWriter.login + " " + HeaderWriter.email;
@@ -39,9 +40,6 @@ class HeaderWriter:
 
 	@classmethod
 	def openFile(HeaderWriter, name):
-		try:
-			fd = open(name, "w")
-			HeaderWriter.writeHeader(fd, name);
-			return fd
-		except Exception as e:
-			print (e)
+		fd = open(name, "w")
+		HeaderWriter.writeHeader(fd, name);
+		return fd

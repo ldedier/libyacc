@@ -1,7 +1,12 @@
-%prefix Term
 %grammarName ArithmeticGrammar
 
-#%folder .
+#%terminalPrefix Terminal
+#%nonTerminalPrefix NonTerminal
+#%prefix Symbol
+
+%returnType int
+%context int
+%contextInstance context 
 
 %tokens
 
