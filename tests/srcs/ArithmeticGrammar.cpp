@@ -11,11 +11,6 @@
 /* ************************************************************************** */
 
 #include "../includes/ArithmeticGrammar.hpp"
-#include "Integer.hpp"
-#include "Arithmetic.hpp"
-#include "Term.hpp"
-#include "Factor.hpp"
-#include "Expr.hpp"
 
 ArithmeticGrammar::ArithmeticGrammar(void) : AbstractGrammar(new Arithmetic())
 {

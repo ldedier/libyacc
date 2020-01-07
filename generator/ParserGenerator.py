@@ -28,7 +28,7 @@ class ParserGenerator:
 		self.returnType = "int";
 		self.context = None;
 		self.contextInstance = None;
-		self.folder = "./libyacc";
+		self.generateMain = False;
 		self.parse(fd);
 		self.grammar = Grammar(fd);
 		print(self);
@@ -53,6 +53,14 @@ class ParserGenerator:
 					self.context = split[1];
 				elif split[0] == "%contextInstance":
 					self.contextInstance = split[1];
+				elif split[0] == "%generateMain":
+					print(split[1]);
+					if (split[1].lower() == "true"):
+						self.generateMain = True;
+					elif (split[1].lower() == "false"):
+						self.generateMain = False;
+					else:
+						raise Exception(split[1] + ": not a valid boolean");
 			elif len(split) == 1:
 				if split[0] == "%tokens":
 					break ;
@@ -63,6 +71,10 @@ class ParserGenerator:
 		define = (prefix + symbol.fileBaseName).upper() + "_HPP";
 		fd.write("#ifndef " + define + "\n");
 		fd.write("# define " + define + "\n");
+		return fd;
+
+	def openFileString(self, folder, string, extension):
+		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + string + extension);
 		return fd;
 
 	@staticmethod
@@ -89,6 +101,9 @@ class ParserGenerator:
 			return "0";
 		else:
 			return (self.returnType + "()");
+	
+	def getTypes(self):
+		return "<" + self.returnType + ", " + self.getContext() + ">";
 
 	def generateTerminalInclude(self, terminal):
 		fd = self.openFile("includes", self.terminalPrefix + self.prefix, terminal, ".hpp");
@@ -103,7 +118,7 @@ class ParserGenerator:
 		fd.write("\tpublic:\n");
 		fd.write("\t\t" + className + "(void);\n");
 		fd.write("\t\t~" + className + "(void);\n");
-		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode<" + self.returnType + ", " + self.getContext() + "> & ast, " + self.getContext() + " " + self.getContextInstance() + ") const;\n");
+		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode" + self.getTypes() + " & ast, " + self.getContext() + " " + self.getContextInstance() + ") const;\n");
 		fd.write("\n");
 		fd.write("\tprivate:\n");
 		fd.write("\n");
@@ -118,13 +133,13 @@ class ParserGenerator:
 	#	fd.write("# include <iostream>\n");
 		fd.write("# include \""+ self.grammarName + ".hpp" + "\"\n");
 		fd.write("\n");
-		fd.write("class " + className + " : public AbstractNonTerminal<" + self.returnType + ", " + self.getContext() + ">\n");
+		fd.write("class " + className + " : public AbstractNonTerminal"+  self.getTypes() + "\n");
 		fd.write("{\n");
 		fd.write("\tpublic:\n");
 		fd.write("\t\t" + className + "(void);\n");
 		fd.write("\t\t~" + className + "(void);\n");
-		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode<" + self.returnType + ", " + self.getContext() + "> & ast, " + self.getContext() + " " + self.getContextInstance() + ") const;\n");
-		fd.write("\t\tvirtual void computeProductions(AbstractGrammar<" + self.returnType + ", " + self.getContext() + "> & cfg);\n");
+		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode" + self.getTypes() +" & ast, " + self.getContext() + " " + self.getContextInstance() + ") const;\n");
+		fd.write("\t\tvirtual void computeProductions(AbstractGrammar" + self.getTypes() + " & cfg);\n");
 		fd.write("\n");
 		fd.write("\tprivate:\n");
 		fd.write("\n");
@@ -132,6 +147,46 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("#endif\n");
 
+	def generateGrammarInclude(self):
+		fd = self.openFileString("includes", self.grammarName, ".hpp");
+		fd.write("\n");
+		define = self.grammarName.upper() + "_HPP";
+		fd.write("#ifndef " + define + "\n");
+		fd.write("# define " + define + "\n");
+		fd.write("\n");
+		fd.write("#include \"libyacc/includes/AbstractGrammar.hpp\"\n");
+		fd.write("\n");
+		for oldIdentifier in self.grammar.nonTerminals:
+			fd.write("#include \"" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".hpp\"\n");
+		fd.write("\n");
+		for oldIdentifier in self.grammar.terminals:
+			fd.write("#include \"" + self.grammar.terminals[oldIdentifier].fileBaseName + ".hpp\"\n");
+		fd.write("\n");
+		fd.write("class " + self.grammarName + " : public AbstractGrammar" + self.getTypes() + "\n");
+		fd.write("{\n");
+		fd.write("\tpublic:\n");
+		fd.write("\t\t" + self.grammarName + "(void);\n");
+		fd.write("\t\t" + self.grammarName + "(" + self.grammarName + " const &instance);\n");
+		fd.write("\t\t" + self.grammarName + " &operator=(" + self.grammarName + " const &rhs);\n");
+		fd.write("\t\tvirtual ~" + self.grammarName + "(void);\n");
+		fd.write("\t\tvirtual std::deque<Token" + self.getTypes() + " *> innerLex(std::istream &istream);\n")
+		fd.write("\n");
+		fd.write("\tprivate:");
+		fd.write("\n");
+		fd.write("\n};");
+		fd.write("\n");
+		fd.write("\n");
+		fd.write("#endif\n");
+
+	def generateIncludes(self):
+		self.mkdir(sys.path[0] + "/../../" + "includes");
+		for oldIdentifier in self.grammar.terminals:
+			self.generateTerminalInclude(self.grammar.terminals[oldIdentifier]);
+		for oldIdentifier in self.grammar.nonTerminals:
+			self.generateNonTerminalInclude(self.grammar.nonTerminals[oldIdentifier]);
+		self.generateGrammarInclude();
+		print("generated Headers !");
+	
 	def generateTerminalSource(self, terminal):
 		fd = self.openFile("srcs", self.terminalPrefix + self.prefix, terminal, ".cpp");
 		className = self.terminalPrefix + self.prefix + terminal.fileBaseName;
@@ -142,7 +197,7 @@ class ParserGenerator:
 		fd.write("{\n\t\n}\n\n");
 		fd.write(className + "::~" + className + "(void)\n");
 		fd.write("{\n\t\n}\n\n");
-		fd.write(self.returnType + "\t" + className + "::" + "traverse(ASTNode<" + self.returnType + ", " + self.getContext() + "> & ast, " + self.getContext() + " " + self.getContextInstance() + ") const\n");
+		fd.write(self.returnType + "\t" + className + "::" + "traverse(ASTNode" + self.getTypes() + " & ast, " + self.getContext() + " " + self.getContextInstance() + ") const\n");
 		fd.write("{\n");
 		fd.write("\tstatic_cast<void>(ast);\n");
 		fd.write("\tstatic_cast<void>(" + self.getContextInstance() + ");\n");
@@ -184,13 +239,37 @@ class ParserGenerator:
 				fd.write("});\n");
 		fd.write("}\n");
 
-	def generateIncludes(self):
-		self.mkdir(sys.path[0] + "/../../" + "includes");
-		for oldIdentifier in self.grammar.terminals:
-			self.generateTerminalInclude(self.grammar.terminals[oldIdentifier]);
+	def generateGrammarSource(self):
+		fd = self.openFileString("srcs", self.grammarName, ".cpp");
+
+		fd.write("\n");
+		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
+			self.grammar.startSymbol.fileBaseName + "())\n");
+		fd.write("{\n");
 		for oldIdentifier in self.grammar.nonTerminals:
-			self.generateNonTerminalInclude(self.grammar.nonTerminals[oldIdentifier]);
-		print("generated Headers !");
+			fd.write("\taddNonTerminal(new " + self.grammar.nonTerminals[oldIdentifier].fileBaseName + "());\n");
+		fd.write("\n");
+		for oldIdentifier in self.grammar.terminals:
+			fd.write("\taddTerminal(new " + self.grammar.terminals[oldIdentifier].fileBaseName + "());\n");
+		fd.write("\n");
+		fd.write("\tcomputeGrammar();\n");
+		fd.write("}\n\n")
+		fd.write("std::deque<Token" + self.getTypes() + " *>" + self.grammarName + "::innerLex(std::istream &istream)\n");
+		fd.write("{\n")
+		fd.write("\tstd::deque>Token" + self.getTypes() + " *>res;\n");
+		fd.write("\treturn (res);\n");
+		fd.write("}\n")
+		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance)\n");
+		fd.write("{\n")
+		fd.write("\t*this = instance;\n")
+		fd.write("}\n\n")
+		fd.write(self.grammarName + "::~" + self.grammarName + "(void)\n");
+		fd.write("{\n\t\n}\n\n")
+		fd.write(self.grammarName + " & " + self.grammarName + "::operator=(" + self.grammarName + " const &rhs)\n")
+		fd.write("{\n");
+		fd.write("\tstatic_cast<void>(rhs);\n");
+		fd.write("\treturn *this;\n");
+		fd.write("}\n");
 	
 	def generateSources(self):
 		self.mkdir(sys.path[0] + "/../../" + "srcs");
@@ -198,7 +277,7 @@ class ParserGenerator:
 			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
 		for oldIdentifier in self.grammar.nonTerminals:
 			self.generateNonTerminalSource(self.grammar.nonTerminals[oldIdentifier]);
-		print("generated Headers !");
+		self.generateGrammarSource();
 		print("generated sources !");
 
 	def generateMakefile(self):
@@ -217,6 +296,7 @@ class ParserGenerator:
 		res += "terminalPrefix: \"" + self.terminalPrefix + "\"\n";
 		res += "grammarName: \"" + self.grammarName + "\"\n";
 		res += "folder: \"" + self.folder + "\"\n";
+		res += "generateMain: " + str(self.generateMain) + "\n";
 		return res;
 
 if len(sys.argv) >= 2:
