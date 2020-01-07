@@ -6,15 +6,12 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 15:08:14 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/05 00:00:45 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/07 14:44:13 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ArithmeticGrammar.hpp"
 #include "LRParser.hpp"
-#include "ASTBuilder.hpp"
-#include "Token.hpp"
-#include <fstream>
 
 int main(void)
 {

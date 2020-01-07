@@ -6,7 +6,7 @@
 #    By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/05 19:12:07 by ldedier           #+#    #+#              #
-#    Updated: 2020/01/05 19:12:07 by ldedier          ###   ########.fr        #
+#    Updated: 2020/01/07 15:54:34 by ldedier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,27 +19,36 @@ class HeaderWriter:
 	email = "ldedier@student.42.fr"
 
 	@classmethod
-	def writeHeader(HeaderWriter, fd, name):
+	def writeHeaderStrings(HeaderWriter, fd, name, start, end):
 		split = name.split("/");
 		name = split[len(split) - 1];
 		name = name[:40];
 		time = datetime.today().strftime('%Y/%m/%d %H:%M:%S') + " by " + HeaderWriter.login;
-		by = HeaderWriter.login + " " + HeaderWriter.email;
+		by = HeaderWriter.login + " <" + HeaderWriter.email + ">";
 
-		fd.write("/* ************************************************************************** */\n")
-		fd.write("/*                                                                            */\n")
-		fd.write("/*                                                        :::      ::::::::   */\n")
-		fd.write("/*   " + name + (" " * (51 - len(name)))         +     ":+:      :+:    :+:   */\n")
-		fd.write("/*                                                    +:+ +:+         +:+     */\n")
-		fd.write("/*   By: " + by + (" " * (len(by) - 15))   +       "+#+  +:+       +#+        */\n")
-		fd.write("/*                                                +#+#+#+#+#+   +#+           */\n")
-		fd.write("/*   Created:" + time + (" " * (len(time) - 17)) +     "#+#    #+#            */\n")
-		fd.write("/*   Updated:" + time + (" " * (len(time) - 18)) +    "###   ########.fr      */\n")
-		fd.write("/*                                                                            */\n")
-		fd.write("/* ************************************************************************** */\n")
+		fd.write(start + " " + ("*" * (2 - len(start))) + "**************************************************************************"+ ("*" *  (2 - len(end)))+ " "  + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "                                                                          " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "                                                       :::      ::::::::  " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "  " + name + (" " * (51 - len(name)))         +     ":+:      :+:    :+:  " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "                                                   +:+ +:+         +:+    " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "  By: " + by + (" " * (43 - len(by)))   +       "+#+  +:+       +#+       " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "                                               +#+#+#+#+#+   +#+          " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "  Created: " + time + (" " * (42 - len(time))) +    "#+#    #+#           " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "  Updated: " + time + (" " * (41 - len(time))) +   "###   ########.fr     " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + (" " * (2 - len(start))) + "                                                                          " + (" " * (2 - len(end)))+ " " + end + "\n")
+		fd.write(start + " " + ("*" * (2 - len(start))) + "**************************************************************************" + ("*" * (2 - len(end)))+ " " + end + "\n")
+
+	@classmethod
+	def writeHeader(HeaderWriter, fd, name):
+		HeaderWriter.writeHeaderStrings(fd, name, "/*", "*/")
+
+	@classmethod
+	def writeHeaderString(HeaderWriter, fd, name, string):
+		HeaderWriter.writeHeaderStrings(fd, name, string, string)
+	
 
 	@classmethod
 	def openFile(HeaderWriter, name):
 		fd = open(name, "w")
-		HeaderWriter.writeHeader(fd, name);
+		HeaderWriter.writeHeader(fd, name)
 		return fd

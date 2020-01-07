@@ -24,7 +24,6 @@ class ParserGenerator:
 		self.nonTerminalPrefix = "";
 		self.terminalPrefix = "";
 		self.grammarName = "MyConcreteGrammar";
-		self.folder = "./libyacc";
 		self.returnType = "int";
 		self.context = None;
 		self.contextInstance = None;
@@ -45,8 +44,6 @@ class ParserGenerator:
 					self.nonTerminalPrefix = split[1];
 				elif split[0] == "%grammarName":
 					self.grammarName = split[1];
-				elif split[0] == "%folder":
-					self.folder = split[1];
 				elif split[0] == "%returnType":
 					self.returnType = split[1];
 				elif split[0] == "%context":
@@ -185,7 +182,6 @@ class ParserGenerator:
 		for oldIdentifier in self.grammar.nonTerminals:
 			self.generateNonTerminalInclude(self.grammar.nonTerminals[oldIdentifier]);
 		self.generateGrammarInclude();
-		print("generated Headers !");
 	
 	def generateTerminalSource(self, terminal):
 		fd = self.openFile("srcs", self.terminalPrefix + self.prefix, terminal, ".cpp");
@@ -202,7 +198,6 @@ class ParserGenerator:
 		fd.write("\tstatic_cast<void>(ast);\n");
 		fd.write("\tstatic_cast<void>(" + self.getContextInstance() + ");\n");
 		fd.write("\treturn (" + self.getDefaultReturnValue() + ");\n")
-		
 		fd.write("}\n");
 		fd.write("\n");
 
@@ -243,8 +238,10 @@ class ParserGenerator:
 		fd = self.openFileString("srcs", self.grammarName, ".cpp");
 
 		fd.write("\n");
+		fd.write("#include \"../includes/" + self.grammarName + ".hpp\"\n");
+		fd.write("\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
-			self.grammar.startSymbol.fileBaseName + "())\n");
+		self.grammar.startSymbol.fileBaseName + "())\n");
 		fd.write("{\n");
 		for oldIdentifier in self.grammar.nonTerminals:
 			fd.write("\taddNonTerminal(new " + self.grammar.nonTerminals[oldIdentifier].fileBaseName + "());\n");
@@ -255,22 +252,54 @@ class ParserGenerator:
 		fd.write("\tcomputeGrammar();\n");
 		fd.write("}\n\n")
 		fd.write("std::deque<Token" + self.getTypes() + " *>" + self.grammarName + "::innerLex(std::istream &istream)\n");
-		fd.write("{\n")
-		fd.write("\tstd::deque>Token" + self.getTypes() + " *>res;\n");
+		fd.write("{\n");
+		fd.write("\tstd::deque>Token" + self.getTypes() + " *> res;\n");
 		fd.write("\treturn (res);\n");
-		fd.write("}\n")
+		fd.write("}\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance)\n");
-		fd.write("{\n")
-		fd.write("\t*this = instance;\n")
-		fd.write("}\n\n")
+		fd.write("{\n");
+		fd.write("\t*this = instance;\n");
+		fd.write("}\n\n");
 		fd.write(self.grammarName + "::~" + self.grammarName + "(void)\n");
-		fd.write("{\n\t\n}\n\n")
+		fd.write("{\n\t\n}\n\n");
 		fd.write(self.grammarName + " & " + self.grammarName + "::operator=(" + self.grammarName + " const &rhs)\n")
 		fd.write("{\n");
 		fd.write("\tstatic_cast<void>(rhs);\n");
 		fd.write("\treturn *this;\n");
 		fd.write("}\n");
 	
+	def generateMainSource(self):
+		fd = self.openFileString("srcs", "main", ".cpp");
+		fd.write("\n");
+		fd.write("#include \"" + self.grammarName + ".hpp\"\n");
+		fd.write("#include \"LRParser.hpp\"\n");
+		fd.write("\n");
+		fd.write("int main(void)\n");
+		fd.write("{\n");
+		fd.write("\t" + self.grammarName + " grammar;");
+		fd.write("\tLRParser" + self.getTypes() + " parser(grammar);\n");
+		fd.write("\tLRParser" + self.getTypes() + " parser(grammar);\n");
+		fd.write("\tstd::deque<Token" + self.getTypes() + " *> tokens;\n");
+		fd.write("\n");
+		fd.write("\ttokens = grammar.lex(std::cin);\n");
+		fd.write("\n");
+		fd.write("\ttry\n");
+		fd.write("\t{\n");
+		fd.write("\t\tASTBuilder" + self.getTypes() + "*b = parser.parse(tokens);\n");
+		fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(0);\n");
+		fd.write("\t\tstd::cout << *b << std::endl\n");
+		fd.write("\t\tstd::cout << \"result: \" << res << std::endl\n");
+		fd.write("\t\tdelete b;\n");
+		fd.write("\t\tdeleteTokens(tokens);\n");
+		fd.write("\t}\n");
+		fd.write("\tcatch (std::exception e)\n");
+		fd.write("\t{\n");
+		fd.write("\t\tdeleteTokens(tokens);\n");
+		fd.write("\t\tstd::cerr << e.what() << std::endl;\n");
+		fd.write("\t}\n");
+		fd.write("\treturn (0);\n");
+		fd.write("}\n");
+
 	def generateSources(self):
 		self.mkdir(sys.path[0] + "/../../" + "srcs");
 		for oldIdentifier in self.grammar.terminals:
@@ -278,9 +307,12 @@ class ParserGenerator:
 		for oldIdentifier in self.grammar.nonTerminals:
 			self.generateNonTerminalSource(self.grammar.nonTerminals[oldIdentifier]);
 		self.generateGrammarSource();
-		print("generated sources !");
+		if (self.generateMain):
+			self.generateMainSource();
 
 	def generateMakefile(self):
+		fd = open(sys.path[0] + "/../../Makefile", "w");
+		hw.writeHeaderStrings(fd, "Makefile", "#", "#");
 		print("generated Makefile !");
 	
 	def generateCode(self):
@@ -295,8 +327,10 @@ class ParserGenerator:
 		res += "NonTerminalPrefix: \"" + self.nonTerminalPrefix + "\"\n";
 		res += "terminalPrefix: \"" + self.terminalPrefix + "\"\n";
 		res += "grammarName: \"" + self.grammarName + "\"\n";
-		res += "folder: \"" + self.folder + "\"\n";
 		res += "generateMain: " + str(self.generateMain) + "\n";
+		res += "returnType: \"" + self.returnType + "\"\n";
+		res += "context: \"" + self.getContext() + "\"\n";
+		res += "contextInstance: \"" + self.getContextInstance() + "\"\n";
 		return res;
 
 if len(sys.argv) >= 2:

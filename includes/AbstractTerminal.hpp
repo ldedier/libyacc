@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:14:12 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 01:02:29 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/07 13:03:40 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class AbstractTerminal : public AbstractSymbol<T, C>
 
 		virtual void initFirstSet()
 		{
-			this->_firstSet.addToken(this);
+			this->_firstSet.addTerminal(this);
 		}
 
 		virtual std::string color(void) const

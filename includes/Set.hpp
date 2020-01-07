@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/28 19:03:16 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 16:52:02 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/07 13:03:25 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,9 +90,9 @@ class Set
 			return _hasEpsilon;
 		}
 
-		void addToken(AbstractTerminal<T,C> *token)
+		void addTerminal(AbstractTerminal<T,C> *terminal)
 		{
-			_tokensMap.insert(std::pair <std::string, AbstractTerminal<T, C> *>(token->getIdentifier(), token));
+			_tokensMap.insert(std::pair <std::string, AbstractTerminal<T, C> *>(terminal->getIdentifier(), terminal));
 		}
 
 		std::map<std::string, AbstractTerminal<T, C> *> & getTokensMap()
