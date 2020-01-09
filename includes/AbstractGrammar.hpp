@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/07 13:03:11 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/09 22:09:10 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class AbstractGrammar
 			delete _startSymbol;
 		}
 
-		void debugGrammar()
+		void debug()
 		{
 			typename std::vector<AbstractNonTerminal<T, C> * >::iterator it = _nonTerminals.begin();
 

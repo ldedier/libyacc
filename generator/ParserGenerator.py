@@ -28,6 +28,7 @@ class ParserGenerator:
 		self.context = None;
 		self.contextInstance = None;
 		self.generateMain = False;
+		self.programName = "a.out";
 		self.parse(fd);
 		self.grammar = Grammar(fd);
 		print(self);
@@ -48,6 +49,8 @@ class ParserGenerator:
 					self.returnType = split[1];
 				elif split[0] == "%context":
 					self.context = split[1];
+				elif split[0] == "%programName":
+					self.programName = split[1];
 				elif split[0] == "%contextInstance":
 					self.contextInstance = split[1];
 				elif split[0] == "%generateMain":
@@ -63,6 +66,10 @@ class ParserGenerator:
 					break ;
 
 	def openFile(self, folder, prefix, symbol, extension):
+		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + prefix + symbol.fileBaseName + extension);
+		return fd;
+	
+	def openFileHeader(self, folder, prefix, symbol, extension):
 		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + prefix + symbol.fileBaseName + extension);
 		fd.write("\n");
 		define = (prefix + symbol.fileBaseName).upper() + "_HPP";
@@ -103,7 +110,7 @@ class ParserGenerator:
 		return "<" + self.returnType + ", " + self.getContext() + ">";
 
 	def generateTerminalInclude(self, terminal):
-		fd = self.openFile("includes", self.terminalPrefix + self.prefix, terminal, ".hpp");
+		fd = self.openFileHeader("includes", self.terminalPrefix + self.prefix, terminal, ".hpp");
 	
 		className = self.terminalPrefix + self.prefix + terminal.fileBaseName;
 		fd.write("\n");
@@ -124,7 +131,7 @@ class ParserGenerator:
 		fd.write("#endif\n");
 
 	def generateNonTerminalInclude(self, nonTerminal):
-		fd = self.openFile("includes", self.nonTerminalPrefix + self.prefix, nonTerminal, ".hpp");
+		fd = self.openFileHeader("includes", self.nonTerminalPrefix + self.prefix, nonTerminal, ".hpp");
 		className = self.nonTerminalPrefix + self.prefix + nonTerminal.fileBaseName;
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
@@ -151,7 +158,7 @@ class ParserGenerator:
 		fd.write("#ifndef " + define + "\n");
 		fd.write("# define " + define + "\n");
 		fd.write("\n");
-		fd.write("#include \"libyacc/includes/AbstractGrammar.hpp\"\n");
+		fd.write("#include \"../libyacc/includes/AbstractGrammar.hpp\"\n");
 		fd.write("\n");
 		for oldIdentifier in self.grammar.nonTerminals:
 			fd.write("#include \"" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".hpp\"\n");
@@ -244,7 +251,8 @@ class ParserGenerator:
 		self.grammar.startSymbol.fileBaseName + "())\n");
 		fd.write("{\n");
 		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("\taddNonTerminal(new " + self.grammar.nonTerminals[oldIdentifier].fileBaseName + "());\n");
+			if (oldIdentifier != self.grammar.startSymbol.oldIdentifier):
+				fd.write("\taddNonTerminal(new " + self.grammar.nonTerminals[oldIdentifier].fileBaseName + "());\n");
 		fd.write("\n");
 		for oldIdentifier in self.grammar.terminals:
 			fd.write("\taddTerminal(new " + self.grammar.terminals[oldIdentifier].fileBaseName + "());\n");
@@ -253,9 +261,11 @@ class ParserGenerator:
 		fd.write("}\n\n")
 		fd.write("std::deque<Token" + self.getTypes() + " *>" + self.grammarName + "::innerLex(std::istream &istream)\n");
 		fd.write("{\n");
-		fd.write("\tstd::deque>Token" + self.getTypes() + " *> res;\n");
+		fd.write("\tstd::deque<Token" + self.getTypes() + " *> res;\n");
+
+		fd.write("\tstatic_cast<void>(istream);\n\n");
 		fd.write("\treturn (res);\n");
-		fd.write("}\n");
+		fd.write("}\n\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance)\n");
 		fd.write("{\n");
 		fd.write("\t*this = instance;\n");
@@ -276,19 +286,19 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("int main(void)\n");
 		fd.write("{\n");
-		fd.write("\t" + self.grammarName + " grammar;");
-		fd.write("\tLRParser" + self.getTypes() + " parser(grammar);\n");
+		fd.write("\t" + self.grammarName + " grammar;\n");
 		fd.write("\tLRParser" + self.getTypes() + " parser(grammar);\n");
 		fd.write("\tstd::deque<Token" + self.getTypes() + " *> tokens;\n");
 		fd.write("\n");
+		fd.write("\tgrammar.debug();\n");
 		fd.write("\ttokens = grammar.lex(std::cin);\n");
 		fd.write("\n");
 		fd.write("\ttry\n");
 		fd.write("\t{\n");
 		fd.write("\t\tASTBuilder" + self.getTypes() + "*b = parser.parse(tokens);\n");
 		fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(0);\n");
-		fd.write("\t\tstd::cout << *b << std::endl\n");
-		fd.write("\t\tstd::cout << \"result: \" << res << std::endl\n");
+		fd.write("\t\tstd::cout << *b << std::endl;\n");
+		fd.write("\t\tstd::cout << \"result: \" << res << std::endl;\n");
 		fd.write("\t\tdelete b;\n");
 		fd.write("\t\tdeleteTokens(tokens);\n");
 		fd.write("\t}\n");
@@ -313,7 +323,83 @@ class ParserGenerator:
 	def generateMakefile(self):
 		fd = open(sys.path[0] + "/../../Makefile", "w");
 		hw.writeHeaderStrings(fd, "Makefile", "#", "#");
+		fd.write("\n");
+		fd.write("NAME\t\t\t=\t" + self.programName + "\n");
+		fd.write("\n");
+		fd.write("CC\t\t\t\t=\tg++\n");
+		fd.write("\n");
+		fd.write("ECHO\t\t\t=\techo\n");
+		fd.write("MKDIR\t\t\t=\tmkdir\n");
+		fd.write("\n");
+		fd.write("DEBUG ?= 0\n");
+		fd.write("\n");
+		fd.write("SRCDIR\t\t\t=\tsrcs/\n");
+		fd.write("OBJDIR\t\t\t=\tobjs/\n");
+		fd.write("BINDIR\t\t\t=\t./\n");
+		fd.write("INCLUDESDIR\t\t=\tincludes/\n");
+		fd.write("\n");
+		fd.write("INCLUDES\t\t=\t" + self.grammarName + ".hpp \\\n");
+
+		for oldIdentifier in self.grammar.terminals:
+			fd.write("\t\t\t\t\t" + self.grammar.terminals[oldIdentifier].fileBaseName + ".hpp \\\n")
+			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
+		for oldIdentifier in self.grammar.nonTerminals:
+			fd.write("\t\t\t\t\t" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".hpp \\\n")
+
+
+		fd.write("\n");
+		fd.write("SRCS\t\t\t=\t" + self.grammarName + ".cpp \\\n");
+
+		for oldIdentifier in self.grammar.terminals:
+			fd.write("\t\t\t\t\t" + self.grammar.terminals[oldIdentifier].fileBaseName + ".cpp \\\n")
+			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
+		for oldIdentifier in self.grammar.nonTerminals:
+			fd.write("\t\t\t\t\t" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".cpp \\\n")
+		if self.generateMain:
+			fd.write("\t\t\t\t\t" + "main.cpp\n")
+
+		fd.write("\n");
+		fd.write("VPATH\t\t\t\t=\t$(INCLUDESDIR) \\\n");
+		fd.write("\t\t\t\t\t=\t$(SRCDIR)\n");
+		fd.write("\n");
+		fd.write("OBJECTS\t\t\t=\t$(addprefix $(OBJDIR), $(SRCS:.cpp=.o))");
+		fd.write("\n");
+		fd.write("CFLAGS\t\t\t=\t-I $(INCLUDESDIR) -Wall -Wextra -Werror -I ../includes -I libyacc/includes\n");
+		fd.write("\n");
+		fd.write("OK_COLOR\t\t\t=\t\\x1b[32;01m\n");
+		fd.write("EOC\t\t\t\t\t=\t\\033[0m\n");
+		fd.write("\n");
+		fd.write("ifeq ($(DEBUG), 1)\n");
+		fd.write("\tCFLAGS += -fsanitize=address\n");
+		fd.write("\t\CC += -g3\n");
+		fd.write("endif\n");
+		fd.write("\n");
+		fd.write("all: $(NAME)\n");
+		fd.write("\n");
+		fd.write("debug:\n");
+		fd.write("\t@$(MAKE) all DEBUG=1\n");
+		fd.write("\n");
+		fd.write("$(BINDIR)$(NAME): $(OBJDIR) $(OBJECTS)\n");
+		fd.write("\t$(CC) -o $@ $(OBJECTS)\n");
+		fd.write("\t@$(ECHO) \"$(OK_COLOR)$(NAME) linked with success ! $(EOC)\"\n");
+		fd.write("\n");
+		fd.write("$(OBJDIR):\n");
+		fd.write("\t@$(MKDIR) $@\n");
+		fd.write("\n");
+		fd.write("$(OBJDIR)%.o: $(SRC_DIR)%.cpp $(INCLUDES)\n");
+		fd.write("\t$(CC) -c $< -o $@ $(CFLAGS)\n");
+		fd.write("\n");
+		fd.write("clean:\n");
+		fd.write("\t@$(RM) -rf $(OBJDIR)");
+		fd.write("\n");
+		fd.write("fclean: clean\n");
+		fd.write("\t@$(RM) -f $(BINDIR)$(NAME)\n");
+		fd.write("\n");
+		fd.write("re: fclean all\n");
+		fd.write("\n");
+		fd.write(".PHONY: all clean fclean re debug\n");
 		print("generated Makefile !");
+
 	
 	def generateCode(self):
 		self.generateIncludes();

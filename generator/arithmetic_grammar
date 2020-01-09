@@ -6,7 +6,7 @@
 
 %returnType int
 %context int
-%contextInstance context 
+%contextInstance context
 %generateMain true
 
 %tokens
