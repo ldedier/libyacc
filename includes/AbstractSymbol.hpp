@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 06:48:30 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 20:35:43 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 01:50:05 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,12 +104,11 @@ class AbstractSymbol
 		virtual T traverse(ASTNode<T, C> & ast, C) const = 0;
 		virtual std::string color(void) const = 0;
 
-	private:
+	protected:
 		std::string _identifier;
 		int			_index;
 		bool		_relevant;
-	protected:
-		Set<T, C> _firstSet;
+		Set<T, C>	_firstSet;
 };
 
 template<typename T, typename C>

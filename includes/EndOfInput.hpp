@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 08:40:39 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/03 15:35:46 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 01:52:49 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,18 @@ class EndOfInput : public AbstractTerminal<T, C>
 		virtual ~EndOfInput(void)
 		{
 			
+		}
+
+		virtual bool staysEligibleForCurrent(std::string & current)
+		{
+			static_cast<void>(current);
+			return false;
+		}
+
+		virtual bool isEligibleForCurrent(std::string & current)
+		{
+			static_cast<void>(current);
+			return false;
 		}
 
 	private:

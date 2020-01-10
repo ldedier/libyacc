@@ -33,6 +33,7 @@ class Symbol:
 		self.oldIdentifier = identifier;
 		self.identifier = identifier.lower();
 		self.fileBaseName = Symbol.capitalizeCustom(fileBaseName);
+		self.role = None;
 
 	def addProduction(self, identifiers, grammar):
 		prod = [];

@@ -15,6 +15,7 @@ from Symbol import Symbol
 
 terminalRoles = {
 	"int",
+	"double",
 	"string",
 }
 
@@ -49,6 +50,7 @@ class Grammar:
 				if (not split[2] in terminalRoles):
 					raise Exception(split[2] + " : not a valid role");
 				self.terminalRoles[split[2]] = symbol;
+				symbol.role = split[2];
 			self.terminals[symbol.oldIdentifier] = symbol;
 			self.symbols[symbol.oldIdentifier] = symbol;
 

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 09:46:25 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 18:39:31 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 00:37:15 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class ArithmeticGrammar: public AbstractGrammar<int, int>
 		ArithmeticGrammar(ArithmeticGrammar const &instance);
 		ArithmeticGrammar &operator=(ArithmeticGrammar const &rhs);
 		virtual ~ArithmeticGrammar(void);
-		virtual std::deque<Token<int, int> *> innerLex(std::istream & istream);
+		// virtual std::deque<Token<int, int> *> innerLex(std::istream & istream);
 
 	private:
 

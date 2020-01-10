@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/09 22:09:10 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 05:07:17 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,24 @@ class AbstractGrammar
 		
 		AbstractGrammar(void) {}
 
-		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol) : _startGrammarSymbol(startGrammarSymbol), _index(0)
+		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol) : _startGrammarSymbol(startGrammarSymbol), _index(0),
+			_intTerminal(nullptr), _doubleTerminal(nullptr), _stringTerminal(nullptr), _blankAsDelimiters(true), _stopAtNewline(true)
 		{
 			addNonTerminal(_startGrammarSymbol);
 			_startSymbol = new Start<T, C>();
 			_endOfInput = new EndOfInput<T, C>();
 			addTerminal(_endOfInput);
 		}
+
+		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol, bool blankAsDelimiter) : _startGrammarSymbol(startGrammarSymbol), _index(0),
+			_intTerminal(nullptr), _doubleTerminal(nullptr), _stringTerminal(nullptr), _blankAsDelimiters(blankAsDelimiter), _stopAtNewline(true)
+		{
+			addNonTerminal(_startGrammarSymbol);
+			_startSymbol = new Start<T, C>();
+			_endOfInput = new EndOfInput<T, C>();
+			addTerminal(_endOfInput);
+		}
+
 
 		AbstractGrammar(AbstractGrammar<T, C> const &instance)
 		{
@@ -153,10 +164,10 @@ class AbstractGrammar
 			addSymbol(nonTerminal);
 		}
 		
-		void addTerminal(AbstractTerminal<T, C> *token)
+		void addTerminal(AbstractTerminal<T, C> *terminal)
 		{
-			_tokens.push_back(token);
-			addSymbol(token);
+			_tokens.push_back(terminal);
+			addSymbol(terminal);
 		}
 
 		void computeProductions()
@@ -258,16 +269,118 @@ class AbstractGrammar
 			// debugGrammar();
 		}
 
-		virtual std::deque<Token<T, C> *> innerLex(std::istream & istream) = 0;
+		AbstractTerminal<T, C> *getIntTerminal()
+		{
+			return _intTerminal;
+		}
+
+		AbstractTerminal<T, C> *getDoubleTerminal()
+		{
+			return _doubleTerminal;
+		}
+
+		AbstractTerminal<T, C> *getStringTerminal()
+		{
+			return _stringTerminal;
+		}
+
+		virtual std::deque<Token<T, C> *> innerLex(std::istream & istream)
+		{
+			std::deque<Token<T, C> *>	res;
+			int							pos;
+			int							endPos;
+			std::string					current;
+			AbstractTerminal<T, C>		*terminal;
+			Token <T, C>				*token;
+			char						c;
+
+			while (!istream.eof())
+			{
+				current.clear();
+				terminal = nullptr;
+				pos = 0;
+				endPos = 0;		
+				while (!istream.eof())
+				{
+					if ((c = istream.peek()) != EOF && ( c != '\n' || !_stopAtNewline))
+					{
+						current += c;
+						if (!treatTerminalEligibility(current, &terminal))
+						{
+							if (terminal)
+							{
+								token = terminal->createToken(current.substr(0, endPos - pos));
+								res.push_back(token);
+								break;
+							}
+							else if (isblank(c) && _blankAsDelimiters)
+							{
+								istream.get();
+								break;
+							}
+							else
+							{
+								std::cout << "lexical error !" << std::endl;
+								throw std::exception();
+							}
+						}
+						else
+						{
+							endPos++;
+							istream.get();
+						}
+					}
+					else
+					{
+						if (terminal)
+						{
+							token = terminal->createToken(current.substr(0, endPos - pos));
+							res.push_back(token);
+						}
+						return res;
+					}
+				}
+			}
+        	return (res);
+		}
 
 		Start<T, C>										* _startSymbol;
 		AbstractNonTerminal<T, C>						* _startGrammarSymbol;
 		EndOfInput<T, C>								* _endOfInput;
+
 		int												_index;
 		std::vector<AbstractNonTerminal<T, C> *>		_nonTerminals;
 		std::vector<AbstractTerminal<T, C> *>			_tokens;
 		std::map<std::string, AbstractSymbol<T, C> *>	_symbolsMap;
 
+		AbstractTerminal<T, C>							* _intTerminal;
+		AbstractTerminal<T, C>							* _doubleTerminal;
+		AbstractTerminal<T, C>							* _stringTerminal;
+		AbstractTerminal<T, C>							* _blankTerminal;
+
+		bool											_blankAsDelimiters;
+		bool											_stopAtNewline;
+
+		private:
+		
+			bool treatTerminalEligibility(std::string current, AbstractTerminal<T, C> **terminal)
+			{
+				typename std::vector<AbstractTerminal<T, C> *>::iterator it = _tokens.begin();
+				bool res = false;
+				std::cout << "start\n";
+				
+				while (it != _tokens.end())
+				{
+					// std::cout << *(*it) << std::endl;
+					if ((*it)->staysEligibleForCurrent(current))
+						res = true;
+					if ((*it)->isEligibleForCurrent(current))
+						*terminal = *it;
+					it++;
+				}
+				std::cout << "end\n";
+				return res;
+			}
 };
 
 template<typename T, typename C>

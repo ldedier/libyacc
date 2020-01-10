@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 09:57:18 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/07 13:05:43 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 00:36:23 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,30 +27,30 @@ ArithmeticGrammar::ArithmeticGrammar(void) : AbstractGrammar(new Arithmetic())
 	computeGrammar();
 }
 
-std::deque<Token<int, int> *> ArithmeticGrammar::innerLex(std::istream & istream)
-{
-	char c;
+// std::deque<Token<int, int> *> ArithmeticGrammar::innerLex(std::istream & istream)
+// {
+// 	char c;
 
-	std::deque<Token<int, int> *> res;
-	while (istream.get(c))
-	{
-		if (c == '\n')
-			return res;
-		if (c == '+')
-			res.push_back(new Token<int, int>(*(getTerminal("+"))));
-		else if (c == '*')
-			res.push_back(new Token<int, int>(*(getTerminal("*"))));
-		else if (c == '/')
-			res.push_back(new Token<int, int>(*(getTerminal("/"))));
-		else if (c == '-')
-			res.push_back(new Token<int, int>(*(getTerminal("-"))));
-		else if (isdigit(c))
-			res.push_back(new Token<int, int>(*(getTerminal("integer")), (int)(c - '0')));
-		else if (!isspace(c))
-			throw std::exception();
-	}
-	return (res);
-}
+// 	std::deque<Token<int, int> *> res;
+// 	while (istream.get(c))
+// 	{
+// 		if (c == '\n')
+// 			return res;
+// 		if (c == '+')
+// 			res.push_back(new Token<int, int>(*(getTerminal("+"))));
+// 		else if (c == '*')
+// 			res.push_back(new Token<int, int>(*(getTerminal("*"))));
+// 		else if (c == '/')
+// 			res.push_back(new Token<int, int>(*(getTerminal("/"))));
+// 		else if (c == '-')
+// 			res.push_back(new Token<int, int>(*(getTerminal("-"))));
+// 		else if (isdigit(c))
+// 			res.push_back(new Token<int, int>(*(getTerminal("integer")), (int)(c - '0')));
+// 		else if (!isspace(c))
+// 			throw std::exception();
+// 	}
+// 	return (res);
+// }
 
 ArithmeticGrammar::ArithmeticGrammar(ArithmeticGrammar const &instance)
 {
