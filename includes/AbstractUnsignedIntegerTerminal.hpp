@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/10 04:46:15 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/10 05:02:29 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 13:07:42 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,16 +46,7 @@ class AbstractUnsignedIntegerTerminal : public AbstractTerminal<T, C>
 
 		virtual bool isEligibleForCurrent(std::string & current)
 		{
-			size_t i;
-
-			i = 0;
-			while (i < current.length())
-			{
-				if (!isdigit(current[i]))
-					return false;
-				i++;
-			}
-			return true;
+			return AbstractUnsignedIntegerTerminal::staysEligibleForCurrent(current);
 		}
 
 		virtual Token<T, C> *createToken(std::string tokenContent)

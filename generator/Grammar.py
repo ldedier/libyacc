@@ -13,19 +13,21 @@
 
 from Symbol import Symbol
 
-terminalRoles = {
-	"int",
-	"double",
-	"string",
+terminalSubclasses = {
+	"int": "AbstractIntegerTerminal",
+	"unsigned_int": "AbstractUnsignedIntegerTerminal",
+	"double": "AbstractTerminal",
+	"string": "AbstractTerminal",
 }
 
 class Grammar:
 
 	@staticmethod
 	def smartSplit(line):
-		split = line.rstrip().split(" ");
-		split = list(filter(None, split));
-		return split;
+		return line.split();
+	#	split = line.rstrip().split(" ");
+	#	split = list(filter(None, split));
+	#	return split;
 
 	def __repr__(self):
 		res = "";
@@ -38,19 +40,19 @@ class Grammar:
 		self.nonTerminals = {};
 		self.symbols = {};
 		self.terminals = {};
-		self.terminalRoles = {};
 		self.startSymbol = None;
+		self.blankAsDelimiter = True;
 		self.fillGrammar(fd);
 
 	def parseTokens(self, line):
 		split = Grammar.smartSplit(line);
+		print(split);
 		if (len(split) >= 2):
 			symbol = Symbol(split[0], split[1]);
 			if (len(split) == 3):
-				if (not split[2] in terminalRoles):
+				if (not split[2] in list(terminalSubclasses.keys())):
 					raise Exception(split[2] + " : not a valid role");
-				self.terminalRoles[split[2]] = symbol;
-				symbol.role = split[2];
+				symbol.subClass = terminalSubclasses[split[2]];
 			self.terminals[symbol.oldIdentifier] = symbol;
 			self.symbols[symbol.oldIdentifier] = symbol;
 

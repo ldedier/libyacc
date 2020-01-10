@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/10 05:07:17 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/10 13:22:59 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class AbstractGrammar
 		AbstractGrammar(void) {}
 
 		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol) : _startGrammarSymbol(startGrammarSymbol), _index(0),
-			_intTerminal(nullptr), _doubleTerminal(nullptr), _stringTerminal(nullptr), _blankAsDelimiters(true), _stopAtNewline(true)
+			_blankAsDelimiters(true)
 		{
 			addNonTerminal(_startGrammarSymbol);
 			_startSymbol = new Start<T, C>();
@@ -39,7 +39,7 @@ class AbstractGrammar
 		}
 
 		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol, bool blankAsDelimiter) : _startGrammarSymbol(startGrammarSymbol), _index(0),
-			_intTerminal(nullptr), _doubleTerminal(nullptr), _stringTerminal(nullptr), _blankAsDelimiters(blankAsDelimiter), _stopAtNewline(true)
+			_blankAsDelimiters(blankAsDelimiter)
 		{
 			addNonTerminal(_startGrammarSymbol);
 			_startSymbol = new Start<T, C>();
@@ -147,11 +147,11 @@ class AbstractGrammar
 			}
 		}
 
-		std::deque<Token<T, C> *> lex(std::istream & istream)
+		std::deque<Token<T, C> *> lex(bool stopAtNewline, std::istream & istream)
 		{
 			std::deque<Token<T, C> *> res;
 
-			res = innerLex(istream);
+			res = innerLex(stopAtNewline, istream);
 			res.push_back(new Token<T, C>(*(getTerminal("_EOI_"))));
 			return res;
 		}
@@ -269,22 +269,7 @@ class AbstractGrammar
 			// debugGrammar();
 		}
 
-		AbstractTerminal<T, C> *getIntTerminal()
-		{
-			return _intTerminal;
-		}
-
-		AbstractTerminal<T, C> *getDoubleTerminal()
-		{
-			return _doubleTerminal;
-		}
-
-		AbstractTerminal<T, C> *getStringTerminal()
-		{
-			return _stringTerminal;
-		}
-
-		virtual std::deque<Token<T, C> *> innerLex(std::istream & istream)
+		virtual std::deque<Token<T, C> *> innerLex(bool stopAtNewline, std::istream & istream)
 		{
 			std::deque<Token<T, C> *>	res;
 			int							pos;
@@ -302,7 +287,7 @@ class AbstractGrammar
 				endPos = 0;		
 				while (!istream.eof())
 				{
-					if ((c = istream.peek()) != EOF && ( c != '\n' || !_stopAtNewline))
+					if ((c = istream.peek()) != EOF && ( c != '\n' || !stopAtNewline))
 					{
 						current += c;
 						if (!treatTerminalEligibility(current, &terminal))
@@ -353,13 +338,7 @@ class AbstractGrammar
 		std::vector<AbstractTerminal<T, C> *>			_tokens;
 		std::map<std::string, AbstractSymbol<T, C> *>	_symbolsMap;
 
-		AbstractTerminal<T, C>							* _intTerminal;
-		AbstractTerminal<T, C>							* _doubleTerminal;
-		AbstractTerminal<T, C>							* _stringTerminal;
-		AbstractTerminal<T, C>							* _blankTerminal;
-
 		bool											_blankAsDelimiters;
-		bool											_stopAtNewline;
 
 		private:
 		
@@ -367,8 +346,6 @@ class AbstractGrammar
 			{
 				typename std::vector<AbstractTerminal<T, C> *>::iterator it = _tokens.begin();
 				bool res = false;
-				std::cout << "start\n";
-				
 				while (it != _tokens.end())
 				{
 					// std::cout << *(*it) << std::endl;
@@ -378,7 +355,6 @@ class AbstractGrammar
 						*terminal = *it;
 					it++;
 				}
-				std::cout << "end\n";
 				return res;
 			}
 };

@@ -29,8 +29,10 @@ class ParserGenerator:
 		self.contextInstance = None;
 		self.generateMain = False;
 		self.programName = "a.out";
+		self.blankAsDelimiter = True;
 		self.parse(fd);
 		self.grammar = Grammar(fd);
+		self.grammar.blankAsDelimiter = self.blankAsDelimiter;
 		print(self);
 
 	def parse(self, fd):
@@ -47,18 +49,24 @@ class ParserGenerator:
 					self.grammarName = split[1];
 				elif split[0] == "%returnType":
 					self.returnType = split[1];
-				elif split[0] == "%context":
+				elif split[0] == "%contextType":
 					self.context = split[1];
 				elif split[0] == "%programName":
 					self.programName = split[1];
 				elif split[0] == "%contextInstance":
 					self.contextInstance = split[1];
 				elif split[0] == "%generateMain":
-					print(split[1]);
 					if (split[1].lower() == "true"):
 						self.generateMain = True;
 					elif (split[1].lower() == "false"):
 						self.generateMain = False;
+					else:
+						raise Exception(split[1] + ": not a valid boolean");
+				elif split[0] == "%blankAsDelimiter":
+					if (split[1].lower() == "true"):
+						self.blankAsDelimiter = True;
+					elif (split[1].lower() == "false"):
+						self.blankAsDelimiter = False;
 					else:
 						raise Exception(split[1] + ": not a valid boolean");
 			elif len(split) == 1:
@@ -115,9 +123,9 @@ class ParserGenerator:
 		className = self.terminalPrefix + self.prefix + terminal.fileBaseName;
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
-		fd.write("# include \"AbstractTerminal.hpp\"\n");
+		fd.write("# include "+"\"" + terminal.subClass + ".hpp\"\n");
 		fd.write("\n");
-		fd.write("class " + className + " : public AbstractTerminal<" + self.returnType + ", " + self.getContext() + ">\n");
+		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContext() + ">\n");	
 		fd.write("{\n");
 		fd.write("\tpublic:\n");
 		fd.write("\t\t" + className + "(void);\n");
@@ -173,7 +181,7 @@ class ParserGenerator:
 		fd.write("\t\t" + self.grammarName + "(" + self.grammarName + " const &instance);\n");
 		fd.write("\t\t" + self.grammarName + " &operator=(" + self.grammarName + " const &rhs);\n");
 		fd.write("\t\tvirtual ~" + self.grammarName + "(void);\n");
-		fd.write("\t\tvirtual std::deque<Token" + self.getTypes() + " *> innerLex(std::istream &istream);\n")
+		#fd.write("\t\tvirtual std::deque<Token" + self.getTypes() + " *> innerLex(std::istream &istream);\n")
 		fd.write("\n");
 		fd.write("\tprivate:");
 		fd.write("\n");
@@ -196,7 +204,7 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("# include \""+ className + ".hpp" + "\"\n");
 		fd.write("\n");
-		fd.write(className + "::" + className + "(void) : AbstractTerminal(\""+ terminal.identifier + "\")\n");
+		fd.write(className + "::" + className + "(void) : " + terminal.subClass +"(\""+ terminal.identifier + "\")\n");
 		fd.write("{\n\t\n}\n\n");
 		fd.write(className + "::~" + className + "(void)\n");
 		fd.write("{\n\t\n}\n\n");
@@ -248,7 +256,7 @@ class ParserGenerator:
 		fd.write("#include \"../includes/" + self.grammarName + ".hpp\"\n");
 		fd.write("\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
-		self.grammar.startSymbol.fileBaseName + "())\n");
+		self.grammar.startSymbol.fileBaseName + "(), " + ("true" if self.grammar.blankAsDelimiter else "false")+ ")\n");
 		fd.write("{\n");
 		for oldIdentifier in self.grammar.nonTerminals:
 			if (oldIdentifier != self.grammar.startSymbol.oldIdentifier):
@@ -259,13 +267,13 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("\tcomputeGrammar();\n");
 		fd.write("}\n\n")
-		fd.write("std::deque<Token" + self.getTypes() + " *>" + self.grammarName + "::innerLex(std::istream &istream)\n");
-		fd.write("{\n");
-		fd.write("\tstd::deque<Token" + self.getTypes() + " *> res;\n");
+	#	fd.write("std::deque<Token" + self.getTypes() + " *>" + self.grammarName + "::innerLex(std::istream &istream)\n");
+	#	fd.write("{\n");
+	#	fd.write("\tstd::deque<Token" + self.getTypes() + " *> res;\n");
 
-		fd.write("\tstatic_cast<void>(istream);\n\n");
-		fd.write("\treturn (res);\n");
-		fd.write("}\n\n");
+	#	fd.write("\tstatic_cast<void>(istream);\n\n");
+	#	fd.write("\treturn (res);\n");
+	#	fd.write("}\n\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance)\n");
 		fd.write("{\n");
 		fd.write("\t*this = instance;\n");
@@ -291,7 +299,7 @@ class ParserGenerator:
 		fd.write("\tstd::deque<Token" + self.getTypes() + " *> tokens;\n");
 		fd.write("\n");
 		fd.write("\tgrammar.debug();\n");
-		fd.write("\ttokens = grammar.lex(std::cin);\n");
+		fd.write("\ttokens = grammar.lex(true, std::cin);\n");
 		fd.write("\n");
 		fd.write("\ttry\n");
 		fd.write("\t{\n");
@@ -409,7 +417,7 @@ class ParserGenerator:
 	def __repr__(self):
 		res = "";
 		res += self.grammar.__repr__() + "\n";
-		res += "prefix: " + self.prefix + "\n";
+		res += "prefix: \"" + self.prefix + "\"\n";
 		res += "NonTerminalPrefix: \"" + self.nonTerminalPrefix + "\"\n";
 		res += "terminalPrefix: \"" + self.terminalPrefix + "\"\n";
 		res += "grammarName: \"" + self.grammarName + "\"\n";

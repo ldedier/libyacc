@@ -5,9 +5,11 @@
 #%prefix Symbol
 
 %returnType int
-%context int
+%contextType int
 %contextInstance context
 %generateMain true
+
+%blankAsDelimiter false
 
 %tokens
 
@@ -24,10 +26,10 @@
 %   Modulo
 -   Minus
 +   Plus
-INC Inc
-DEC Dec
-INTEGER    Integer   int
-VARIABLE   Variable  string
+++	Inc
+--	Dec
+INTEGER    Integer		unsigned_int
+VARIABLE   Variable 	string
 
 %nonterminals
 
@@ -59,10 +61,10 @@ term       :   factor
 ;
 factor         :   INTEGER
 |                  VARIABLE
-|                  INC VARIABLE
-|                  VARIABLE INC
-|                  DEC VARIABLE
-|                  VARIABLE DEC
+|                  ++ VARIABLE
+|                  VARIABLE ++
+|                  -- VARIABLE
+|                  VARIABLE --
 |                  - factor
 |                  + factor
 ;
