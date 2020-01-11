@@ -73,14 +73,14 @@ class ParserGenerator:
 				if split[0] == "%tokens":
 					break ;
 
-	def openFile(self, folder, prefix, symbol, extension):
-		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + prefix + symbol.fileBaseName + extension);
+	def openFile(self, folder, name, extension):
+		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + name + extension);
 		return fd;
 	
-	def openFileHeader(self, folder, prefix, symbol, extension):
-		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + prefix + symbol.fileBaseName + extension);
+	def openFileHeader(self, folder, name, extension):
+		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + name + extension);
 		fd.write("\n");
-		define = (prefix + symbol.fileBaseName).upper() + "_HPP";
+		define = name.upper() + "_HPP";
 		fd.write("#ifndef " + define + "\n");
 		fd.write("# define " + define + "\n");
 		return fd;
@@ -117,10 +117,19 @@ class ParserGenerator:
 	def getTypes(self):
 		return "<" + self.returnType + ", " + self.getContext() + ">";
 
+	def getFullBaseName(self, symbol):
+		
+		if len(symbol.productions) == 0:
+			pref = self.terminalPrefix;
+		else:
+			pref = self.nonTerminalPrefix;
+		return self.prefix + pref + symbol.fileBaseName;
+
+
 	def generateTerminalInclude(self, terminal):
-		fd = self.openFileHeader("includes", self.terminalPrefix + self.prefix, terminal, ".hpp");
+		fd = self.openFileHeader("includes", self.getFullBaseName(terminal), ".hpp");
 	
-		className = self.terminalPrefix + self.prefix + terminal.fileBaseName;
+		className = self.getFullBaseName(terminal);
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
 		fd.write("# include "+"\"" + terminal.subClass + ".hpp\"\n");
@@ -139,8 +148,8 @@ class ParserGenerator:
 		fd.write("#endif\n");
 
 	def generateNonTerminalInclude(self, nonTerminal):
-		fd = self.openFileHeader("includes", self.nonTerminalPrefix + self.prefix, nonTerminal, ".hpp");
-		className = self.nonTerminalPrefix + self.prefix + nonTerminal.fileBaseName;
+		fd = self.openFileHeader("includes", self.getFullBaseName(nonTerminal), ".hpp");
+		className = self.getFullBaseName(nonTerminal);
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
 		fd.write("# include \""+ self.grammarName + ".hpp" + "\"\n");
@@ -169,10 +178,10 @@ class ParserGenerator:
 		fd.write("#include \"../libyacc/includes/AbstractGrammar.hpp\"\n");
 		fd.write("\n");
 		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("#include \"" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".hpp\"\n");
+			fd.write("#include \"" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".hpp\"\n");
 		fd.write("\n");
 		for oldIdentifier in self.grammar.terminals:
-			fd.write("#include \"" + self.grammar.terminals[oldIdentifier].fileBaseName + ".hpp\"\n");
+			fd.write("#include \"" + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + ".hpp\"\n");
 		fd.write("\n");
 		fd.write("class " + self.grammarName + " : public AbstractGrammar" + self.getTypes() + "\n");
 		fd.write("{\n");
@@ -199,8 +208,9 @@ class ParserGenerator:
 		self.generateGrammarInclude();
 	
 	def generateTerminalSource(self, terminal):
-		fd = self.openFile("srcs", self.terminalPrefix + self.prefix, terminal, ".cpp");
-		className = self.terminalPrefix + self.prefix + terminal.fileBaseName;
+		fd = self.openFile("srcs", self.getFullBaseName(terminal), ".cpp");
+
+		className = self.getFullBaseName(terminal);
 		fd.write("\n");
 		fd.write("# include \""+ className + ".hpp" + "\"\n");
 		fd.write("\n");
@@ -218,8 +228,8 @@ class ParserGenerator:
 
 
 	def generateNonTerminalSource(self, nonTerminal):
-		fd = self.openFile("srcs", self.nonTerminalPrefix + self.prefix, nonTerminal, ".cpp");
-		className = self.nonTerminalPrefix + self.prefix + nonTerminal.fileBaseName;
+		fd = self.openFile("srcs", self.getFullBaseName(nonTerminal), ".cpp");
+		className = self.getFullBaseName(nonTerminal);
 		fd.write("\n");
 		fd.write("# include \""+ className + ".hpp" + "\"\n");
 		fd.write("\n");
@@ -256,14 +266,14 @@ class ParserGenerator:
 		fd.write("#include \"../includes/" + self.grammarName + ".hpp\"\n");
 		fd.write("\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
-		self.grammar.startSymbol.fileBaseName + "(), " + ("true" if self.grammar.blankAsDelimiter else "false")+ ")\n");
+		self.getFullBaseName(self.grammar.startSymbol) + "(), " + ("true" if self.grammar.blankAsDelimiter else "false")+ ")\n");
 		fd.write("{\n");
 		for oldIdentifier in self.grammar.nonTerminals:
 			if (oldIdentifier != self.grammar.startSymbol.oldIdentifier):
-				fd.write("\taddNonTerminal(new " + self.grammar.nonTerminals[oldIdentifier].fileBaseName + "());\n");
+				fd.write("\taddNonTerminal(new " + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + "());\n");
 		fd.write("\n");
 		for oldIdentifier in self.grammar.terminals:
-			fd.write("\taddTerminal(new " + self.grammar.terminals[oldIdentifier].fileBaseName + "());\n");
+			fd.write("\taddTerminal(new " + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + "());\n");
 		fd.write("\n");
 		fd.write("\tcomputeGrammar();\n");
 		fd.write("}\n\n")
@@ -349,20 +359,20 @@ class ParserGenerator:
 		fd.write("INCLUDES\t\t=\t" + self.grammarName + ".hpp \\\n");
 
 		for oldIdentifier in self.grammar.terminals:
-			fd.write("\t\t\t\t\t" + self.grammar.terminals[oldIdentifier].fileBaseName + ".hpp \\\n")
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + ".hpp \\\n")
 			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
 		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("\t\t\t\t\t" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".hpp \\\n")
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".hpp \\\n")
 
 
 		fd.write("\n");
 		fd.write("SRCS\t\t\t=\t" + self.grammarName + ".cpp \\\n");
 
 		for oldIdentifier in self.grammar.terminals:
-			fd.write("\t\t\t\t\t" + self.grammar.terminals[oldIdentifier].fileBaseName + ".cpp \\\n")
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + ".cpp \\\n")
 			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
 		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("\t\t\t\t\t" + self.grammar.nonTerminals[oldIdentifier].fileBaseName + ".cpp \\\n")
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".cpp \\\n")
 		if self.generateMain:
 			fd.write("\t\t\t\t\t" + "main.cpp\n")
 
@@ -431,9 +441,9 @@ if len(sys.argv) >= 2:
 	path = sys.argv[1]
 else:
 	sys.exit("you shall add the path of your grammar")
-try:
-	gen = ParserGenerator(path);
-	gen.generateCode();
-except Exception as e:
-	print(e);
-	exit(1);
+# try:
+gen = ParserGenerator(path);
+gen.generateCode();
+# except Exception as e:
+# print(e);
+exit(1);

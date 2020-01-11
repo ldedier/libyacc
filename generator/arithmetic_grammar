@@ -1,15 +1,17 @@
 %grammarName ArithmeticGrammar
 
-#%terminalPrefix Terminal
-#%nonTerminalPrefix NonTerminal
-#%prefix Symbol
+%terminalPrefix Terminal
+%nonTerminalPrefix NonTerminal
+%prefix Symbol
 
 %returnType int
-%contextType int
+%contextType CustomStack
+
+#%ContextFileBaseName CustomStack
 %contextInstance context
 %generateMain true
 
-%blankAsDelimiter false
+%blankAsDelimiter true
 
 %tokens
 
