@@ -6,6 +6,7 @@
 
 %returnType int
 %contextType CustomStack
+#%passContextBy copy/pointer/reference
 
 %contextFileBaseName CustomStack
 %contextInstance context

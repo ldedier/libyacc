@@ -136,6 +136,8 @@ class ParserGenerator:
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
 		fd.write("# include "+"\"" + terminal.subClass + ".hpp\"\n");
+		if (self.contextFileBaseName != None):
+			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
 		fd.write("\n");
 		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContext() + ">\n");	
 		fd.write("{\n");
@@ -243,8 +245,6 @@ class ParserGenerator:
 		className = self.getFullBaseName(terminal);
 		fd.write("\n");
 		fd.write("# include \"" + className + ".hpp" + "\"\n");
-		if (self.contextFileBaseName != None):
-			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
 		fd.write("\n");
 		fd.write(className + "::" + className + "(void) : " + terminal.subClass +"(\""+ terminal.identifier + "\")\n");
 		fd.write("{\n\t\n}\n\n");
@@ -264,8 +264,6 @@ class ParserGenerator:
 		className = self.getFullBaseName(nonTerminal);
 		fd.write("\n");
 		fd.write("# include \""+ className + ".hpp" + "\"\n");
-		if (self.contextFileBaseName != None):
-			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
 		fd.write("\n");
 		fd.write(className + "::" + className + "(void) : AbstractNonTerminal(\""+ nonTerminal.identifier + "\")\n");
 		fd.write("{\n\t\n}\n\n");
@@ -350,7 +348,7 @@ class ParserGenerator:
 		fd.write("\ttry\n");
 		fd.write("\t{\n");
 		fd.write("\t\tASTBuilder" + self.getTypes() + "*b = parser.parse(tokens);\n");
-		fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(0);\n");
+		fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(" + self.getContext() + "()" + ");\n");
 		fd.write("\t\tstd::cout << *b << std::endl;\n");
 		fd.write("\t\tstd::cout << \"result: \" << res << std::endl;\n");
 		fd.write("\t\tdelete b;\n");
@@ -424,6 +422,8 @@ class ParserGenerator:
 			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
 		for oldIdentifier in self.grammar.nonTerminals:
 			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".hpp \\\n")
+		if (self.contextFileBaseName != None):
+			fd.write("\t\t\t\t\t" + self.contextFileBaseName + ".hpp \\\n");
 
 
 		fd.write("\n");
