@@ -7,7 +7,7 @@
 %returnType int
 %contextType CustomStack
 
-#%ContextFileBaseName CustomStack
+%contextFileBaseName CustomStack
 %contextInstance context
 %generateMain true
 

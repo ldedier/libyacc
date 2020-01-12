@@ -27,6 +27,7 @@ class ParserGenerator:
 		self.returnType = "int";
 		self.context = None;
 		self.contextInstance = None;
+		self.contextFileBaseName = None;
 		self.generateMain = False;
 		self.programName = "a.out";
 		self.blankAsDelimiter = True;
@@ -55,6 +56,8 @@ class ParserGenerator:
 					self.programName = split[1];
 				elif split[0] == "%contextInstance":
 					self.contextInstance = split[1];
+				elif split[0] == "%contextFileBaseName":
+					self.contextFileBaseName = split[1];
 				elif split[0] == "%generateMain":
 					if (split[1].lower() == "true"):
 						self.generateMain = True;
@@ -264,6 +267,8 @@ class ParserGenerator:
 
 		fd.write("\n");
 		fd.write("#include \"../includes/" + self.grammarName + ".hpp\"\n");
+		if (self.contextFileBaseName != None):
+			fd.write("#include \"../includes/" + self.contextFileBaseName + ".hpp\"\n");
 		fd.write("\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
 		self.getFullBaseName(self.grammar.startSymbol) + "(), " + ("true" if self.grammar.blankAsDelimiter else "false")+ ")\n");
@@ -328,6 +333,27 @@ class ParserGenerator:
 		fd.write("\treturn (0);\n");
 		fd.write("}\n");
 
+	def generateBasicSource(self, path, baseClassName, override):
+		fileFullPath = path + "/" + baseClassName + ".cpp";
+		if not os.path.exists(fileFullPath) and not override:
+			return;
+		fd = open(fileFullPath, "w");
+		hw.writeHeader(fd, fileFullPath);
+		fd.write("\n");
+		fd.write(baseClassName + "::" + baseClassName + "(void) \n");
+		fd.write("{\n\t\n}\n\n");
+		fd.write(baseClassName + "::" + baseClassName + "(" + baseClassName + " const &instance)\n");
+		fd.write("{\n");
+		fd.write("\t*this = instance;\n");
+		fd.write("}\n\n");
+		fd.write(baseClassName + "::~" + baseClassName + "(void)\n");
+		fd.write("{\n\t\n}\n\n");
+		fd.write(baseClassName + " & " + baseClassName + "::operator=(" + baseClassName + " const &rhs)\n")
+		fd.write("{\n");
+		fd.write("\tstatic_cast<void>(rhs);\n");
+		fd.write("\treturn *this;\n");
+		fd.write("}\n");
+
 	def generateSources(self):
 		self.mkdir(sys.path[0] + "/../../" + "srcs");
 		for oldIdentifier in self.grammar.terminals:
@@ -337,6 +363,8 @@ class ParserGenerator:
 		self.generateGrammarSource();
 		if (self.generateMain):
 			self.generateMainSource();
+		if self.contextFileBaseName != None:
+			self.generateBasicSource(sys.path[0] + "/../../srcs/", self.contextFileBaseName, True);
 
 	def generateMakefile(self):
 		fd = open(sys.path[0] + "/../../Makefile", "w");
@@ -374,8 +402,9 @@ class ParserGenerator:
 		for oldIdentifier in self.grammar.nonTerminals:
 			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".cpp \\\n")
 		if self.generateMain:
-			fd.write("\t\t\t\t\t" + "main.cpp\n")
-
+			fd.write("\t\t\t\t\t" + "main.cpp \\\n")
+		if (self.contextFileBaseName != None):
+			fd.write("\t\t\t\t\t" + self.contextFileBaseName + ".cpp \\\n");
 		fd.write("\n");
 		fd.write("VPATH\t\t\t\t=\t$(INCLUDESDIR) \\\n");
 		fd.write("\t\t\t\t\t=\t$(SRCDIR)\n");
@@ -435,6 +464,10 @@ class ParserGenerator:
 		res += "returnType: \"" + self.returnType + "\"\n";
 		res += "context: \"" + self.getContext() + "\"\n";
 		res += "contextInstance: \"" + self.getContextInstance() + "\"\n";
+		if (self.contextFileBaseName != None):
+			res += "contextFileBaseName: \"" + self.contextFileBaseName + "\"\n";
+		else:
+			res += "contextFileBaseName: None\n";
 		return res;
 
 if len(sys.argv) >= 2:
