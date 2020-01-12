@@ -6,13 +6,15 @@
 
 %returnType int
 %contextType CustomStack
-%passContextBy pointer
+%passContextBy reference
 
 %contextFileBaseName CustomStack
 %contextInstance context
 %generateMain true
 
 %blankAsDelimiter true
+
+%programName arithmetic
 
 %tokens
 

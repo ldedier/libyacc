@@ -46,7 +46,6 @@ class Grammar:
 
 	def parseTokens(self, line):
 		split = Grammar.smartSplit(line);
-		print(split);
 		if (len(split) >= 2):
 			symbol = Symbol(split[0], split[1]);
 			if (len(split) == 3):

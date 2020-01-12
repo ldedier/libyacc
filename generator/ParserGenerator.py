@@ -46,13 +46,15 @@ class ParserGenerator:
 	def parse(self, fd):
 		for line in fd:
 			split = Grammar.smartSplit(line);
-			if (len(split) == 2):
+			if len(split) == 2:
 				if split[0] == "%prefix":
 					self.prefix = split[1];
-				if split[0] == "%terminalPrefix":
+				elif split[0] == "%terminalPrefix":
 					self.terminalPrefix = split[1];
-				if split[0] == "%nonTerminalPrefix":
+				elif split[0] == "%nonTerminalPrefix":
 					self.nonTerminalPrefix = split[1];
+				elif split[0] == "%programName":
+					self.programName = split[1];
 				elif split[0] == "%grammarName":
 					self.grammarName = split[1];
 				elif split[0] == "%returnType":
@@ -85,6 +87,8 @@ class ParserGenerator:
 						self.blankAsDelimiter = False;
 					else:
 						raise Exception(split[1] + ": not a valid boolean");
+				elif (len(split[0]) and split[0][0] != '#'):
+					raise Exception(split[0] + ": invalid option");
 			elif len(split) == 1:
 				if split[0] == "%tokens":
 					break ;
