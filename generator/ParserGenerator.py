@@ -25,13 +25,20 @@ class ParserGenerator:
 		self.terminalPrefix = "";
 		self.grammarName = "MyConcreteGrammar";
 		self.returnType = "int";
-		self.context = None;
+		self.contextType = None;
 		self.contextInstance = None;
 		self.contextFileBaseName = None;
+		self.passContextBy = "reference";
 		self.generateMain = False;
 		self.programName = "a.out";
 		self.blankAsDelimiter = True;
 		self.parse(fd);
+		if self.passContextBy == "reference":
+			self.contextSuffix = " &";
+		elif (self.passContextBy == "pointer"):
+			self.contextSuffix = " *";
+		else:
+			self.contextSuffix = "";
 		self.grammar = Grammar(fd);
 		self.grammar.blankAsDelimiter = self.blankAsDelimiter;
 		print(self);
@@ -51,12 +58,18 @@ class ParserGenerator:
 				elif split[0] == "%returnType":
 					self.returnType = split[1];
 				elif split[0] == "%contextType":
-					self.context = split[1];
+					self.contextType = split[1];
 				elif split[0] == "%programName":
 					self.programName = split[1];
 				elif split[0] == "%contextInstance":
 					self.contextInstance = split[1];
 				elif split[0] == "%contextFileBaseName":
+					self.contextFileBaseName = split[1];
+				elif split[0] == "%passContextBy":
+					if (split[1].lower() == "copy" or split[1].lower() == "reference" or split[1].lower() == "pointer"):
+						self.passContextBy = split[1].lower();
+					else:
+						raise Exception(split[1] + ": not a valid argument (copy/reference/pointer)");
 					self.contextFileBaseName = split[1];
 				elif split[0] == "%generateMain":
 					if (split[1].lower() == "true"):
@@ -97,14 +110,17 @@ class ParserGenerator:
 		if not os.path.exists(path):
 			os.mkdir(path);
 
-	def getContext(self):
-		if (self.context == None):
+	def getContextType(self):
+		if (self.contextType == None):
 			return "int"
 		else:
-			return self.context;
+			return self.contextType;
+
+	def getContextTypeWithSuffix(self):
+		return self.getContextType() + self.contextSuffix;
 
 	def getContextInstance(self):
-		if (self.context == None):
+		if (self.contextType == None):
 			return "dummy"
 		elif (self.contextInstance == None):
 			return "context"
@@ -118,7 +134,7 @@ class ParserGenerator:
 			return (self.returnType + "()");
 	
 	def getTypes(self):
-		return "<" + self.returnType + ", " + self.getContext() + ">";
+		return "<" + self.returnType + ", " + self.getContextTypeWithSuffix() + ">";
 
 	def getFullBaseName(self, symbol):
 		
@@ -139,12 +155,12 @@ class ParserGenerator:
 		if (self.contextFileBaseName != None):
 			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
 		fd.write("\n");
-		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContext() + ">\n");	
+		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContextTypeWithSuffix() + ">\n");	
 		fd.write("{\n");
 		fd.write("\tpublic:\n");
 		fd.write("\t\t" + className + "(void);\n");
 		fd.write("\t\t~" + className + "(void);\n");
-		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode" + self.getTypes() + " & ast, " + self.getContext() + " " + self.getContextInstance() + ") const;\n");
+		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode" + self.getTypes() + " & ast, " + self.getContextTypeWithSuffix() + " " + self.getContextInstance() + ") const;\n");
 		fd.write("\n");
 		fd.write("\tprivate:\n");
 		fd.write("\n");
@@ -164,7 +180,7 @@ class ParserGenerator:
 		fd.write("\tpublic:\n");
 		fd.write("\t\t" + className + "(void);\n");
 		fd.write("\t\t~" + className + "(void);\n");
-		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode" + self.getTypes() +" & ast, " + self.getContext() + " " + self.getContextInstance() + ") const;\n");
+		fd.write("\t\tvirtual " + self.returnType + " traverse(ASTNode" + self.getTypes() +" & ast, " + self.getContextTypeWithSuffix() + " " + self.getContextInstance() + ") const;\n");
 		fd.write("\t\tvirtual void computeProductions(AbstractGrammar" + self.getTypes() + " & cfg);\n");
 		fd.write("\n");
 		fd.write("\tprivate:\n");
@@ -250,7 +266,7 @@ class ParserGenerator:
 		fd.write("{\n\t\n}\n\n");
 		fd.write(className + "::~" + className + "(void)\n");
 		fd.write("{\n\t\n}\n\n");
-		fd.write(self.returnType + "\t" + className + "::" + "traverse(ASTNode" + self.getTypes() + " & ast, " + self.getContext() + " " + self.getContextInstance() + ") const\n");
+		fd.write(self.returnType + "\t" + className + "::" + "traverse(ASTNode" + self.getTypes() + " & ast, " + self.getContextTypeWithSuffix() + " " + self.getContextInstance() + ") const\n");
 		fd.write("{\n");
 		fd.write("\tstatic_cast<void>(ast);\n");
 		fd.write("\tstatic_cast<void>(" + self.getContextInstance() + ");\n");
@@ -269,14 +285,14 @@ class ParserGenerator:
 		fd.write("{\n\t\n}\n\n");
 		fd.write(className + "::~" + className + "(void)\n");
 		fd.write("{\n\t\n}\n\n");
-		fd.write(self.returnType + "\t" + className + "::" + "traverse(ASTNode<" + self.returnType + ", " + self.getContext() + "> & ast, " + self.getContext() + " " + self.getContextInstance() + ") const\n");
+		fd.write(self.returnType + "\t" + className + "::" + "traverse(ASTNode<" + self.returnType + ", " + self.getContextTypeWithSuffix() + "> & ast, " + self.getContextTypeWithSuffix() + " " + self.getContextInstance() + ") const\n");
 		fd.write("{\n");
 		fd.write("\tstatic_cast<void>(ast);\n");
 		fd.write("\tstatic_cast<void>(" + self.getContextInstance() + ");\n");
 		fd.write("\treturn (" + self.getDefaultReturnValue() + ");\n")
 		fd.write("}\n");
 		fd.write("\n");
-		fd.write("void\t" + className + "::" + "computeProductions(AbstractGrammar<" + self.returnType + ", " + self.getContext() + "> & cfg)\n");
+		fd.write("void\t" + className + "::" + "computeProductions(AbstractGrammar<" + self.returnType + ", " + self.getContextTypeWithSuffix() + "> & cfg)\n");
 		fd.write("{\n");
 		for prod in nonTerminal.productions:
 			fd.write("\taddProduction(cfg, " + str(len(prod)) + ", ");
@@ -341,14 +357,20 @@ class ParserGenerator:
 		fd.write("\t" + self.grammarName + " grammar;\n");
 		fd.write("\tLRParser" + self.getTypes() + " parser(grammar);\n");
 		fd.write("\tstd::deque<Token" + self.getTypes() + " *> tokens;\n");
+		if (self.passContextBy != "copy"):
+			fd.write("\t" + self.getContextType() + " " + self.getContextInstance() + ";\n");
 		fd.write("\n");
 		fd.write("\tgrammar.debug();\n");
 		fd.write("\ttokens = grammar.lex(true, std::cin);\n");
-		fd.write("\n");
 		fd.write("\ttry\n");
 		fd.write("\t{\n");
 		fd.write("\t\tASTBuilder" + self.getTypes() + "*b = parser.parse(tokens);\n");
-		fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(" + self.getContext() + "()" + ");\n");
+		if (self.passContextBy == "copy"):
+			fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(" + self.getContextType() + "()" + ");\n");
+		elif (self.passContextBy == "reference"):
+			fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(" + self.getContextInstance() + ");\n");
+		elif (self.passContextBy == "pointer"):
+			fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(" + "&" + self.getContextInstance() + ");\n");
 		fd.write("\t\tstd::cout << *b << std::endl;\n");
 		fd.write("\t\tstd::cout << \"result: \" << res << std::endl;\n");
 		fd.write("\t\tdelete b;\n");
@@ -495,7 +517,7 @@ class ParserGenerator:
 		res += "grammarName: \"" + self.grammarName + "\"\n";
 		res += "generateMain: " + str(self.generateMain) + "\n";
 		res += "returnType: \"" + self.returnType + "\"\n";
-		res += "context: \"" + self.getContext() + "\"\n";
+		res += "contextType: \"" + self.getContextType() + "\"\n";
 		res += "contextInstance: \"" + self.getContextInstance() + "\"\n";
 		if (self.contextFileBaseName != None):
 			res += "contextFileBaseName: \"" + self.contextFileBaseName + "\"\n";
