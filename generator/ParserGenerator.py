@@ -180,6 +180,8 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("#include \"../libyacc/includes/AbstractGrammar.hpp\"\n");
 		fd.write("\n");
+		if (self.contextFileBaseName != None):
+			fd.write("#include \"" + self.contextFileBaseName + ".hpp\"\n");
 		for oldIdentifier in self.grammar.nonTerminals:
 			fd.write("#include \"" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".hpp\"\n");
 		fd.write("\n");
@@ -202,6 +204,29 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("#endif\n");
 
+	def generateBasicInclude(self, path, baseClassName, override):
+		fileFullPath = path + "/" + baseClassName + ".hpp";
+		if not os.path.exists(fileFullPath) and not override:
+			return;
+		fd = open(fileFullPath, "w");
+		hw.writeHeader(fd, fileFullPath);
+		fd.write("\n");
+		define = baseClassName.upper() + "_HPP";
+		fd.write("#ifndef " + define + "\n");
+		fd.write("# define " + define + "\n");
+		fd.write("\n");
+		fd.write("class " + baseClassName + "\n");
+		fd.write("{\n");
+		fd.write("\n");
+		fd.write("\tpublic:\n\n");
+		fd.write("\t\t" + baseClassName + "(void);\n");
+		fd.write("\t\t" + baseClassName + "(" + baseClassName + " const &instance);\n");
+		fd.write("\t\t" + baseClassName + " & " + "operator=(" + baseClassName + " const &rhs);\n");
+		fd.write("\t\t" + "~" + baseClassName + "(void);\n");
+		fd.write("\n");
+		fd.write("};\n");
+		fd.write("#endif\n");
+
 	def generateIncludes(self):
 		self.mkdir(sys.path[0] + "/../../" + "includes");
 		for oldIdentifier in self.grammar.terminals:
@@ -209,13 +234,17 @@ class ParserGenerator:
 		for oldIdentifier in self.grammar.nonTerminals:
 			self.generateNonTerminalInclude(self.grammar.nonTerminals[oldIdentifier]);
 		self.generateGrammarInclude();
+		if self.contextFileBaseName != None:
+			self.generateBasicInclude(sys.path[0] + "/../../includes/", self.contextFileBaseName, True);
 	
 	def generateTerminalSource(self, terminal):
 		fd = self.openFile("srcs", self.getFullBaseName(terminal), ".cpp");
 
 		className = self.getFullBaseName(terminal);
 		fd.write("\n");
-		fd.write("# include \""+ className + ".hpp" + "\"\n");
+		fd.write("# include \"" + className + ".hpp" + "\"\n");
+		if (self.contextFileBaseName != None):
+			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
 		fd.write("\n");
 		fd.write(className + "::" + className + "(void) : " + terminal.subClass +"(\""+ terminal.identifier + "\")\n");
 		fd.write("{\n\t\n}\n\n");
@@ -235,6 +264,8 @@ class ParserGenerator:
 		className = self.getFullBaseName(nonTerminal);
 		fd.write("\n");
 		fd.write("# include \""+ className + ".hpp" + "\"\n");
+		if (self.contextFileBaseName != None):
+			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
 		fd.write("\n");
 		fd.write(className + "::" + className + "(void) : AbstractNonTerminal(\""+ nonTerminal.identifier + "\")\n");
 		fd.write("{\n\t\n}\n\n");
@@ -339,6 +370,8 @@ class ParserGenerator:
 			return;
 		fd = open(fileFullPath, "w");
 		hw.writeHeader(fd, fileFullPath);
+		fd.write("\n");
+		fd.write("#include \"" + baseClassName + ".hpp\"\n");
 		fd.write("\n");
 		fd.write(baseClassName + "::" + baseClassName + "(void) \n");
 		fd.write("{\n\t\n}\n\n");
