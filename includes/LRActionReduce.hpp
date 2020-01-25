@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:30:29 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 22:24:56 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/25 14:02:30 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,7 @@ class LRActionReduce : public AbstractLRAction<T, C>
 			ASTNode<T, C> *replacingASTNode;
 			std::list<ASTNode<T, C>* > childs; 
 			typename std::list<ASTNode<T, C > * >::iterator it;
-			// std::cout << "before reduce" << std::endl;
-			// getchar();
+
 			(void)tokens_it;
 			parentASTBuilderItem = new StackItem<T, C>(_production->getFrom());
 			size = _production->getSymbols().size();
@@ -100,9 +99,7 @@ class LRActionReduce : public AbstractLRAction<T, C>
 			goalStateItem = new StackItem<T, C>(shiftAction->getState());
 			
 			*rootItem = parentASTBuilderItem;
-			stack.push_front(parentASTBuilderItem); //LEAKS HERE
-			// std::cout << "after reduce" << std::endl;
-			// getchar();
+			stack.push_front(parentASTBuilderItem);
 			stack.push_front(goalStateItem);
 			return (1);
 		}

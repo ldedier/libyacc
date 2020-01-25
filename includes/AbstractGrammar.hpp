@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/25 12:58:28 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/25 14:23:25 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ class AbstractGrammar
 			delete _startSymbol;
 		}
 
-		void debug()
+		void debug(bool printFirstSets)
 		{
 			typename std::vector<AbstractNonTerminal<T, C> * >::iterator it = _nonTerminals.begin();
 
@@ -82,12 +82,16 @@ class AbstractGrammar
 				(*it)->printProductions();
 				it++;
 			}
-			std::cout << "First Sets: " << std::endl << std::endl;
-			it = _nonTerminals.begin();
-			while (it != _nonTerminals.end())
+			if (printFirstSets)
 			{
-				(*it)->printFirstSet();
-				it++;
+
+				std::cout << "First Sets: " << std::endl << std::endl;
+				it = _nonTerminals.begin();
+				while (it != _nonTerminals.end())
+				{
+					(*it)->printFirstSet();
+					it++;
+				}
 			}
 		}
 
@@ -167,6 +171,7 @@ class AbstractGrammar
 
 				LexicalErrorException(const std::string current) : _reason("lexical error: \"" + current + "\" can't refer to a token belonging to this grammar")
 				{
+
 				}
 
 				LexicalErrorException(LexicalErrorException const &instance)
@@ -304,7 +309,6 @@ class AbstractGrammar
 		{
 			computeProductions();
 			computeFirstSets();
-			// debugGrammar();
 		}
 
 		virtual std::deque<Token<T, C> *> innerLex(bool stopAtNewline, std::istream & istream)
@@ -342,7 +346,10 @@ class AbstractGrammar
 								break;
 							}
 							else
+							{
+								deleteTokens(res);
 								throw AbstractGrammar<T, C>::LexicalErrorException(current);
+							}
 						}
 						else
 						{
@@ -358,7 +365,10 @@ class AbstractGrammar
 							res.push_back(token);
 						}
 						else if (current != "")
+						{
+							deleteTokens(res);
 							throw AbstractGrammar<T, C>::LexicalErrorException(current);
+						}
 						return res;
 					}
 				}
@@ -403,6 +413,20 @@ void deleteTokens(std::deque<Token<T, C> *> &tokens)
 	while (it != tokens.end())
 	{
 		delete *it;
+		it++;
+	}
+}
+
+template<typename T, typename C>
+void printTokenQueue(std::deque<Token<T, C> *> &tokens)
+{
+	size_t i = 0;
+	typename std::deque<Token<T, C> *>::iterator it = tokens.begin();
+	std::cout << std::endl << "tokens:" << std::endl;
+	while (it != tokens.end())
+	{
+		std::cout << "Token #" << i << ": " << *(*it) << std::endl;
+		i++;
 		it++;
 	}
 }
