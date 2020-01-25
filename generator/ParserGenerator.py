@@ -364,10 +364,11 @@ class ParserGenerator:
 		if (self.passContextBy != "copy"):
 			fd.write("\t" + self.getContextType() + " " + self.getContextInstance() + ";\n");
 		fd.write("\n");
-		fd.write("\tgrammar.debug();\n");
-		fd.write("\ttokens = grammar.lex(true, std::cin);\n");
+		fd.write("\tgrammar.debug(false);\n");
 		fd.write("\ttry\n");
 		fd.write("\t{\n");
+		fd.write("\t\ttokens = grammar.lex(true, std::cin);\n");
+		fd.write("\t\tprintTokenQueue(tokens);\n");
 		fd.write("\t\tASTBuilder" + self.getTypes() + "*b = parser.parse(tokens);\n");
 		if (self.passContextBy == "copy"):
 			fd.write("\t\t" + self.returnType + " res = b->getASTRoot()->getTraversed(" + self.getContextType() + "()" + ");\n");
@@ -380,7 +381,12 @@ class ParserGenerator:
 		fd.write("\t\tdelete b;\n");
 		fd.write("\t\tdeleteTokens(tokens);\n");
 		fd.write("\t}\n");
-		fd.write("\tcatch (std::exception e)\n");
+		fd.write("\tcatch (const LRActionError" + self.getTypes() + "::SyntaxErrorException &e)\n");
+		fd.write("\t{\n");
+		fd.write("\t\tdeleteTokens(tokens);\n");
+		fd.write("\t\tstd::cerr << std::endl << e.what() << std::endl;\n");
+		fd.write("\t}\n");
+		fd.write("\tcatch (const AbstractGrammar" + self.getTypes() + "::LexicalErrorException &e)\n");
 		fd.write("\t{\n");
 		fd.write("\t\tdeleteTokens(tokens);\n");
 		fd.write("\t\tstd::cerr << e.what() << std::endl;\n");
