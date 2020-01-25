@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 23:17:15 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/24 21:43:19 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ class LRParser
 						return res;
 					}
 				}
-				catch (const std::exception& e)
+				catch (const typename LRActionError<T, C>::SyntaxErrorException& e)
 				{
 					if (rootItem)
 						res = rootItem->getASTBuilder();
@@ -118,8 +118,7 @@ class LRParser
 						res = nullptr;
 					clearStackCheckOrphans(stack, res);
 					delete res;
-					std::cerr << e.what() << std::endl;
-					throw std::exception();
+					throw e;
 				}
 			}
 			throw std::exception();

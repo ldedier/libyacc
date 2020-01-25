@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/10 13:22:59 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/25 12:58:28 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,44 @@ class AbstractGrammar
 			return res;
 		}
 		
+		class LexicalErrorException : public std::exception
+		{
+			public:
+
+				LexicalErrorException(void): _reason("lexical error")
+				{
+
+				}
+
+				LexicalErrorException(const std::string current) : _reason("lexical error: \"" + current + "\" can't refer to a token belonging to this grammar")
+				{
+				}
+
+				LexicalErrorException(LexicalErrorException const &instance)
+				{
+					*this = instance;
+				}
+
+				LexicalErrorException &operator=(LexicalErrorException const &rhs)
+				{
+					static_cast<void>(rhs);
+					return *this;
+				}
+
+				virtual ~LexicalErrorException(void) throw()
+				{
+
+				}
+
+				virtual const char *what() const throw()
+				{
+					return (this->_reason.c_str());
+				}
+
+			private:
+				const std::string _reason;
+		};
+
 	protected:
 
 		void addNonTerminal(AbstractNonTerminal<T, C> * nonTerminal)
@@ -304,10 +342,7 @@ class AbstractGrammar
 								break;
 							}
 							else
-							{
-								std::cout << "lexical error !" << std::endl;
-								throw std::exception();
-							}
+								throw AbstractGrammar<T, C>::LexicalErrorException(current);
 						}
 						else
 						{
@@ -322,6 +357,8 @@ class AbstractGrammar
 							token = terminal->createToken(current.substr(0, endPos - pos));
 							res.push_back(token);
 						}
+						else if (current != "")
+							throw AbstractGrammar<T, C>::LexicalErrorException(current);
 						return res;
 					}
 				}

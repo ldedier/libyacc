@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:29:09 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 22:05:52 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/01/24 21:39:33 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,37 @@ class LRActionError : public AbstractLRAction<T, C>
 			(void)parser;
 			(void)stack;
 			(void)rootItem;
-			throw std::exception();
-			return 1;
+			throw LRActionError::SyntaxErrorException();
 		}
+
+		class SyntaxErrorException : public std::exception
+		{
+			public:
+				SyntaxErrorException(void) {}
+				
+				SyntaxErrorException(SyntaxErrorException const &instance)
+				{
+					*this = instance;
+				}
+
+				SyntaxErrorException &operator=(SyntaxErrorException const &rhs)
+				{
+					static_cast<void>(rhs);
+					return *this;
+				}
+
+				virtual ~SyntaxErrorException(void) throw()
+				{
+
+				}
+
+				virtual const char *what() const throw()
+				{
+					return "Syntax error";
+				}
+
+			private:
+		};
 
 	private:
 
