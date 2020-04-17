@@ -16,8 +16,9 @@ from Symbol import Symbol
 terminalSubclasses = {
 	"int": "AbstractIntegerTerminal",
 	"unsigned_int": "AbstractUnsignedIntegerTerminal",
+	"separator": "AbstractSeparatorTerminal",
+	"string": "AbstractStringTerminal",
 	"double": "AbstractTerminal",
-	"string": "AbstractTerminal",
 }
 
 class Grammar:
