@@ -37,7 +37,7 @@ int	Expr::traverse(ASTNode<int, int> & node, int dummy) const
 
 void	Expr::computeProductions(AbstractGrammar<int, int> &cfg)
 {
-	addProduction(cfg, 1, (std::string []){"term"});
-	addProduction(cfg, 3, (std::string []){"expr", "+", "term"}, true);
-	addProduction(cfg, 3, (std::string []){"expr", "-", "term"});
+	addProduction(cfg, {"term"});
+	addProduction(cfg, {"expr", "+", "term"}, true);
+	addProduction(cfg, {"expr", "-", "term"});
 }

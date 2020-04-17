@@ -15,14 +15,12 @@
 
 # include <iostream>
 # include <map>
+# include <initializer_list>
 # include "AbstractSymbol.hpp"
 # include "Production.hpp"
 
 template<typename T, typename C>
 class AbstractGrammar;
-
-// template<typename T, typename C>
-// class AbstractSymbol;
 
 template<typename T, typename C>
 class AbstractNonTerminal : public AbstractSymbol<T, C>
@@ -60,15 +58,15 @@ class AbstractNonTerminal : public AbstractSymbol<T, C>
 			}
 		}
 
-		void addProduction(AbstractGrammar<T, C> &cfg, int nbSymbols, std::string  *tbl, bool replacing)
+		void addProduction(AbstractGrammar<T, C> &cfg, std::initializer_list<const char*> symbols, bool replacing)
 		{
-			Production<T, C> *prod = new Production<T, C>(*this, cfg, nbSymbols, tbl, replacing);
+			Production<T, C> *prod = new Production<T, C>(*this, cfg, symbols, replacing);
 			_productions.push_back(prod);
 		}
 
-		void addProduction(AbstractGrammar<T, C> &cfg, int nbSymbols, std::string  *tbl)
+		void addProduction(AbstractGrammar<T, C> &cfg, std::initializer_list<const char*> symbols)
 		{
-			Production<T, C> *prod = new Production<T, C>(*this, cfg, nbSymbols, tbl);
+			Production<T, C> *prod = new Production<T, C>(*this, cfg, symbols);
 			_productions.push_back(prod);
 		}
 

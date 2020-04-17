@@ -19,7 +19,7 @@ int main(void)
 	LRParser<int, int> parser(ag);
 	std::deque<Token<int, int> *> tokens;
 
-	tokens = ag.lex(std::cin);
+	tokens = ag.lex(true, std::cin);
 	try
 	{
 		ASTBuilder<int, int> *b = parser.parse(tokens);
@@ -29,7 +29,7 @@ int main(void)
 		delete b;
 		deleteTokens(tokens);
 	}
-	catch (std::exception e)
+	catch (std::exception &e)
 	{
 		deleteTokens(tokens);
 		std::cerr << e.what() << std::endl;

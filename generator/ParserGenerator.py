@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
@@ -299,16 +299,12 @@ class ParserGenerator:
 		fd.write("void\t" + className + "::" + "computeProductions(AbstractGrammar<" + self.returnType + ", " + self.getContextTypeWithSuffix() + "> & cfg)\n");
 		fd.write("{\n");
 		for prod in nonTerminal.productions:
-			fd.write("\taddProduction(cfg, " + str(len(prod)) + ", ");
-			if (len(prod) == 0):
-				fd.write("nullptr);\n");
-			else:
-				fd.write("(std::string[]){");
-				for i, symbol in enumerate(prod):
-					fd.write("\"" + symbol.identifier + "\"");
-					if len(prod) - 1 != i:
-						fd.write(", ");
-				fd.write("});\n");
+			fd.write("\taddProduction(cfg, {");
+			for i, symbol in enumerate(prod):
+				fd.write("\"" + symbol.identifier + "\"");
+				if len(prod) - 1 != i:
+					fd.write(", ");
+			fd.write("});\n");
 		fd.write("}\n");
 
 	def generateGrammarSource(self):
@@ -338,7 +334,7 @@ class ParserGenerator:
 	#	fd.write("\tstatic_cast<void>(istream);\n\n");
 	#	fd.write("\treturn (res);\n");
 	#	fd.write("}\n\n");
-		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance)\n");
+		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance) : AbstractGrammar" + self.getTypes() + "(instance)\n");
 		fd.write("{\n");
 		fd.write("\t*this = instance;\n");
 		fd.write("}\n\n");

@@ -37,7 +37,7 @@ int	Factor::traverse(ASTNode<int, int> & node, int dummy) const
 
 void	Factor::computeProductions(AbstractGrammar<int, int> &cfg)
 {
-	addProduction(cfg, 1, (std::string []){"integer"});
-	addProduction(cfg, 2, (std::string []){"-", "factor"});
-	addProduction(cfg, 2, (std::string []){"+", "factor"});
+	addProduction(cfg, {"integer"});
+	addProduction(cfg, {"-", "factor"});
+	addProduction(cfg, {"+", "factor"});
 }

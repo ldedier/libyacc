@@ -32,6 +32,6 @@ int	Arithmetic::traverse(ASTNode<int, int> & node, int dummy) const
 
 void	Arithmetic::computeProductions(AbstractGrammar<int, int> &cfg)
 {
-	addProduction(cfg, 1, (std::string []){"expr"});
-	addProduction(cfg, 0, nullptr);
+	addProduction(cfg, {"expr"});
+	addProduction(cfg, {});
 }

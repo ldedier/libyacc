@@ -46,7 +46,7 @@ int	Term::traverse(ASTNode<int, int> & node, int dummy) const
 
 void	Term::computeProductions(AbstractGrammar<int, int> &cfg)
 {
-	addProduction(cfg, 1, (std::string []){"factor"});
-	addProduction(cfg, 3, (std::string []){"term", "*", "factor"});
-	addProduction(cfg, 3, (std::string []){"term", "/", "factor"});
+	addProduction(cfg, {"factor"});
+	addProduction(cfg, {"term", "*", "factor"});
+	addProduction(cfg, {"term", "/", "factor"});
 }

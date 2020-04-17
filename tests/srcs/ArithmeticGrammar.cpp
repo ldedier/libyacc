@@ -52,7 +52,7 @@ ArithmeticGrammar::ArithmeticGrammar(void) : AbstractGrammar(new Arithmetic())
 // 	return (res);
 // }
 
-ArithmeticGrammar::ArithmeticGrammar(ArithmeticGrammar const &instance)
+ArithmeticGrammar::ArithmeticGrammar(ArithmeticGrammar const &instance) : AbstractGrammar<int, int>(instance)
 {
 	*this = instance;
 }

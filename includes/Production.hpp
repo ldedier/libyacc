@@ -28,27 +28,17 @@ class Production
 {
 	public:
 
-		Production(AbstractNonTerminal<T, C> & from, AbstractGrammar<T, C> &cfg, int nbSymbols, std::string *tbl) : _from(&from), _symbols(), _replacing(false)
+		Production(AbstractNonTerminal<T, C> & from, AbstractGrammar<T, C> &cfg, std::initializer_list<const char*>& symbols) : _from(&from), _symbols(), _replacing(false)
 		{
-			int i;
-
-			i = 0;
-			while (i < nbSymbols)
-			{
-				_symbols.push_back(cfg.getSymbol(tbl[i]));
-				i++;
+			for (auto& symbol : symbols) {
+				_symbols.push_back(cfg.getSymbol(symbol));
 			}
 		}
 
-		Production(AbstractNonTerminal<T, C> & from, AbstractGrammar<T, C> &cfg, int nbSymbols, std::string *tbl, bool replacing) : _from(&from), _symbols(), _replacing(replacing)
+		Production(AbstractNonTerminal<T, C> & from, AbstractGrammar<T, C> &cfg, std::initializer_list<const char*>& symbols, bool replacing) : _from(&from), _symbols(), _replacing(replacing)
 		{
-			int i;
-
-			i = 0;
-			while (i < nbSymbols)
-			{
-				_symbols.push_back(cfg.getSymbol(tbl[i]));
-				i++;
+			for (auto& symbol : symbols) {
+				_symbols.push_back(cfg.getSymbol(symbol));
 			}
 		}
 

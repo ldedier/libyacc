@@ -1,31 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   AbstractSeparatorTerminal.hpp                      :+:      :+:    :+:   */
+/*   AbstractStringTerminal.hpp                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ldedier </var/mail/ldedier>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/04/17 02:09:09 by ldedier           #+#    #+#             */
-/*   Updated: 2020/04/17 03:09:12 by ldedier          ###   ########.fr       */
+/*   Created: 2020/04/17 12:30:51 by ldedier           #+#    #+#             */
+/*   Updated: 2020/04/17 12:30:51 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ABSTRACTSEPARATORTERMINAL_HPP
-# define ABSTRACTSEPARATORTERMINAL_HPP
+#ifndef ABSTRACTSTRINGTERMINAL_HPP
+# define ABSTRACTSTRINGTERMINAL_HPP
 
 # include <iostream>
 # include "AbstractTerminal.hpp"
 
 template<typename T, typename C>
-class AbstractSeparatorTerminal : public AbstractTerminal<T, C>
+class AbstractStringTerminal : public AbstractTerminal<T, C>
 {
 	public:
-		AbstractSeparatorTerminal(void)
+		AbstractStringTerminal(void)
 		{
 
 		}
 
-		AbstractSeparatorTerminal(std::string identifier) : AbstractTerminal<T, C>(identifier)
+		AbstractStringTerminal(std::string identifier) : AbstractTerminal<T, C>(identifier)
 		{
 
 		}
@@ -37,16 +37,16 @@ class AbstractSeparatorTerminal : public AbstractTerminal<T, C>
 			i = 0;
 			while (i < current.length())
 			{
-				if (!isblank(current[i]))
+				if (isblank(current[i]))
 					return false;
 				i++;
 			}
-			return true;
+			return false;
 		}
 
 		virtual bool isEligibleForCurrent(std::string & current)
 		{
-			return AbstractSeparatorTerminal::staysEligibleForCurrent(current);
+			return AbstractStringTerminal::staysEligibleForCurrent(current);
 		}
 
 		virtual Token<T, C> *createToken(std::string tokenContent)

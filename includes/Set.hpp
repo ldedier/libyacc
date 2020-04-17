@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include <map>
+# include <vector>
 // # include "AbstractGrammar.hpp"
 
 template<typename T, typename C>

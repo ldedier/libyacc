@@ -112,7 +112,7 @@ class Token
 			return _tokenUnion.dval;
 		}
 
-		float getStringValue(void)
+		std::string getStringValue(void)
 		{
 			return _str;
 		}

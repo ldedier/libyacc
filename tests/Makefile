@@ -12,7 +12,7 @@
 
 NAME	= arithmetic
 
-CC		= g++
+CC		= g++ -std=c++11
 
 ECHO = echo
 MKDIR = mkdir
