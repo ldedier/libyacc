@@ -431,7 +431,7 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("NAME\t\t\t=\t" + self.programName + "\n");
 		fd.write("\n");
-		fd.write("CC\t\t\t\t=\tg++\n");
+		fd.write("CC\t\t\t\t=\tg++ -std=c++11\n");
 		fd.write("\n");
 		fd.write("ECHO\t\t\t=\techo\n");
 		fd.write("MKDIR\t\t\t=\tmkdir\n");
