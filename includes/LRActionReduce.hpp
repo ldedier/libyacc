@@ -44,6 +44,12 @@ class LRActionReduce : public AbstractLRAction<T, C>
 			static_cast<void>(rhs);
 			return *this;
 		}
+
+		Production<T, C> *getProduction()
+		{
+			return _production;
+		}
+
 		virtual ~LRActionReduce(void)
 		{
 			

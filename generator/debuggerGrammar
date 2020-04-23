@@ -1,0 +1,120 @@
+%grammarName DebuggerGrammar
+
+%terminalPrefix Terminal
+%nonTerminalPrefix NonTerminal
+%prefix Symbol
+
+%returnType int
+%contextType CustomStack
+%passContextBy reference
+
+%contextFileBaseName CustomStack
+%contextInstance context
+%generateMain true
+
+%blankAsDelimiter true
+
+%programName debuggerTest
+
+%tokens
+
+>   Greater
+>=  GreaterOrEqual
+<   Lesser
+<=  LesserOrEqual
+&&  And
+||  Or
+&   BinaryAnd
+|   BinaryOr
+<<	LeftShift
+>>	RightShift
+!=  NotEqual
+==  Equal
+*   Multiply
+/   Divide
+%   Modulo
+-   Minus
++   Plus
+d	Decimal
+x	Hexadecimal
+o	Octal
+b	Binary
+(   OpenParenthesis
+)   ClosedParenthesis
+hh  halfWordFormat
+h   wordFormat
+print Print
+
+INTEGER    Integer		unsigned_int
+VARIABLE   Variable 	string
+
+%nonterminals
+
+%start command
+
+command            : printCommand
+|                    xCommand
+|                    simpleCommand
+|                    _EPS_
+;
+printCommand       : print  value
+|	                 print / format value
+;
+xCommand           : x xSuffix  value
+|                    x value
+;
+unit			   : hh
+| 					 h
+;
+xSuffix            : / INTEGER format unit
+|                    / INTEGER format
+|                    / format
+;
+format             : d
+|				     x
+|				     o
+|				     b
+;
+value			   : innerValue
+|                    _EPS_
+;
+innerValue         : andOr
+|					 ( innerValue )
+;
+andOr :  comparison
+|        andOr && comparison
+|        andOr || comparison
+;
+comparison : expr
+|        comparison  >  expr
+|        comparison  >=  expr
+|        comparison  <  expr
+|        comparison  <=  expr
+|        comparison  !=  expr
+|        comparison  ==  expr
+;
+expr               : term
+|                    expr  +  term
+|                    expr  -  term
+;
+simpleCommand      : commandName
+|                    commandName commandSuffix
+;
+commandName        : VARIABLE
+;
+commandSuffix      : VARIABLE commandSuffix
+|                    VARIABLE
+;
+term               : factor
+|                    term  *  factor
+|                    term  /  factor
+|                    term  >>  factor
+|                    term  <<  factor
+|                    term  |  factor
+|                    term  &  factor
+;
+factor         :   INTEGER
+|				   ( innerValue )
+|                  - factor
+|                  + factor
+;

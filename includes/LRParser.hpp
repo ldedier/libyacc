@@ -311,8 +311,6 @@ class LRParser
 				if ((nonTerminal = dynamic_cast<AbstractNonTerminal<T, C> * >(symbol)))
 				{
 					Set<T, C> set = Set<T, C>(*_cfg, ++it, item.getProduction().getSymbols(), item.getLookahead());
-					// std::cout << "set: \n";
-					// std::cout << set;
 					changes |= computeClosureFromNonTerminal(state, *nonTerminal, set);
 				}
 				it++;
@@ -418,12 +416,14 @@ class LRParser
 			LRActionShift<T, C>		*testShift;
 			LRActionReduce<T, C>	*testReduce;
 			typename std::map<AbstractSymbol<T, C> *, LRState<T, C> *>::iterator it = state.getTransitions().begin();
-			
+
 			while (it != state.getTransitions().end())
 			{
 				if ((testReduce = dynamic_cast<LRActionReduce<T, C> *>(_tables[stateIndex][(it->first)->getIndex()])))
 				{
-					std::cerr << "Shift Reduce conflict" << std::endl;
+					std::cerr << "Reduce Shift conflict" << std::endl;
+					std::cerr << *(testReduce->getProduction()) << std::endl;
+					std::cerr << *(it->second) << std::endl;
 				}
 				if ((testShift = dynamic_cast<LRActionShift<T, C> *>(_tables[stateIndex][(it->first)->getIndex()])))
 				{
