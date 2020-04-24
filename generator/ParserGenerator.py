@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
@@ -24,6 +24,11 @@ class ParserGenerator:
 		self.nonTerminalPrefix = "";
 		self.terminalPrefix = "";
 		self.grammarName = "MyConcreteGrammar";
+		
+		self.makefileFolder = "../../";
+		self.generatedIncludesFolder = "../../includes/parser/";
+		self.generatedSourcesFolder = "../../srcs/parser/";
+
 		self.returnType = "int";
 		self.contextType = None;
 		self.contextInstance = None;
@@ -53,14 +58,18 @@ class ParserGenerator:
 					self.terminalPrefix = split[1];
 				elif split[0] == "%nonTerminalPrefix":
 					self.nonTerminalPrefix = split[1];
-				elif split[0] == "%programName":
-					self.programName = split[1];
 				elif split[0] == "%grammarName":
 					self.grammarName = split[1];
 				elif split[0] == "%returnType":
 					self.returnType = split[1];
 				elif split[0] == "%contextType":
 					self.contextType = split[1];
+				elif split[0] == "%generatedIncludesFolder":
+					self.generatedIncludesFolder = split[1];
+				elif split[0] == "%generatedSourcesFolder":
+					self.generatedSourcesFolder = split[1];
+				elif split[0] == "%makefileFolder":
+					self.makefileFolder = split[1];
 				elif split[0] == "%programName":
 					self.programName = split[1];
 				elif split[0] == "%contextInstance":
@@ -72,7 +81,6 @@ class ParserGenerator:
 						self.passContextBy = split[1].lower();
 					else:
 						raise Exception(split[1] + ": not a valid argument (copy/reference/pointer)");
-					self.contextFileBaseName = split[1];
 				elif split[0] == "%generateMain":
 					if (split[1].lower() == "true"):
 						self.generateMain = True;
@@ -94,11 +102,11 @@ class ParserGenerator:
 					break ;
 
 	def openFile(self, folder, name, extension):
-		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + name + extension);
+		fd = hw.openFile(sys.path[0] + "/" + folder + name + extension);
 		return fd;
 	
 	def openFileHeader(self, folder, name, extension):
-		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + name + extension);
+		fd = hw.openFile(sys.path[0] + "/" + folder + name + extension);
 		fd.write("\n");
 		define = name.upper() + "_HPP";
 		fd.write("#ifndef " + define + "\n");
@@ -106,7 +114,7 @@ class ParserGenerator:
 		return fd;
 
 	def openFileString(self, folder, string, extension):
-		fd = hw.openFile(sys.path[0] + "/../../" + folder + "/" + string + extension);
+		fd = hw.openFile(sys.path[0] + "/" + folder  + string + extension);
 		return fd;
 
 	@staticmethod
@@ -150,14 +158,14 @@ class ParserGenerator:
 
 
 	def generateTerminalInclude(self, terminal):
-		fd = self.openFileHeader("includes", self.getFullBaseName(terminal), ".hpp");
+		fd = self.openFileHeader(self.generatedIncludesFolder, self.getFullBaseName(terminal), ".hpp");
 	
 		className = self.getFullBaseName(terminal);
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
 		fd.write("# include "+"\"" + terminal.subClass + ".hpp\"\n");
 		if (self.contextFileBaseName != None):
-			fd.write("# include \"" + self.contextFileBaseName + ".hpp" + "\"\n");
+			fd.write("# include \"" + self.contextFileBaseName + ".hpp\"\n");
 		fd.write("\n");
 		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContextTypeWithSuffix() + ">\n");	
 		fd.write("{\n");
@@ -173,7 +181,7 @@ class ParserGenerator:
 		fd.write("#endif\n");
 
 	def generateNonTerminalInclude(self, nonTerminal):
-		fd = self.openFileHeader("includes", self.getFullBaseName(nonTerminal), ".hpp");
+		fd = self.openFileHeader(self.generatedIncludesFolder, self.getFullBaseName(nonTerminal), ".hpp");
 		className = self.getFullBaseName(nonTerminal);
 		fd.write("\n");
 	#	fd.write("# include <iostream>\n");
@@ -194,13 +202,13 @@ class ParserGenerator:
 		fd.write("#endif\n");
 
 	def generateGrammarInclude(self):
-		fd = self.openFileString("includes", self.grammarName, ".hpp");
+		fd = self.openFileString(self.generatedIncludesFolder, self.grammarName, ".hpp");
 		fd.write("\n");
 		define = self.grammarName.upper() + "_HPP";
 		fd.write("#ifndef " + define + "\n");
 		fd.write("# define " + define + "\n");
 		fd.write("\n");
-		fd.write("#include \"../libyacc/includes/AbstractGrammar.hpp\"\n");
+		fd.write("#include \"AbstractGrammar.hpp\"\n");
 		fd.write("\n");
 		if (self.contextFileBaseName != None):
 			fd.write("#include \"" + self.contextFileBaseName + ".hpp\"\n");
@@ -250,17 +258,17 @@ class ParserGenerator:
 		fd.write("#endif\n");
 
 	def generateIncludes(self):
-		self.mkdir(sys.path[0] + "/../../" + "includes");
+		self.mkdir(sys.path[0] + "/" + self.generatedIncludesFolder);
 		for oldIdentifier in self.grammar.terminals:
 			self.generateTerminalInclude(self.grammar.terminals[oldIdentifier]);
 		for oldIdentifier in self.grammar.nonTerminals:
 			self.generateNonTerminalInclude(self.grammar.nonTerminals[oldIdentifier]);
 		self.generateGrammarInclude();
 		if self.contextFileBaseName != None:
-			self.generateBasicInclude(sys.path[0] + "/../../includes/", self.contextFileBaseName, True);
+			self.generateBasicInclude(sys.path[0] + "/" + self.generatedIncludesFolder, self.contextFileBaseName, True);
 	
 	def generateTerminalSource(self, terminal):
-		fd = self.openFile("srcs", self.getFullBaseName(terminal), ".cpp");
+		fd = self.openFile(self.generatedSourcesFolder, self.getFullBaseName(terminal), ".cpp");
 
 		className = self.getFullBaseName(terminal);
 		fd.write("\n");
@@ -280,7 +288,7 @@ class ParserGenerator:
 
 
 	def generateNonTerminalSource(self, nonTerminal):
-		fd = self.openFile("srcs", self.getFullBaseName(nonTerminal), ".cpp");
+		fd = self.openFile(self.generatedSourcesFolder, self.getFullBaseName(nonTerminal), ".cpp");
 		className = self.getFullBaseName(nonTerminal);
 		fd.write("\n");
 		fd.write("# include \""+ className + ".hpp" + "\"\n");
@@ -308,12 +316,12 @@ class ParserGenerator:
 		fd.write("}\n");
 
 	def generateGrammarSource(self):
-		fd = self.openFileString("srcs", self.grammarName, ".cpp");
+		fd = self.openFileString(self.generatedSourcesFolder, self.grammarName, ".cpp");
 
 		fd.write("\n");
-		fd.write("#include \"../includes/" + self.grammarName + ".hpp\"\n");
+		fd.write("#include \"" + self.grammarName + ".hpp\"\n");
 		if (self.contextFileBaseName != None):
-			fd.write("#include \"../includes/" + self.contextFileBaseName + ".hpp\"\n");
+			fd.write("#include \"" + self.contextFileBaseName + ".hpp\"\n");
 		fd.write("\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
 		self.getFullBaseName(self.grammar.startSymbol) + "(), " + ("true" if self.grammar.blankAsDelimiter else "false")+ ")\n");
@@ -327,13 +335,6 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("\tcomputeGrammar();\n");
 		fd.write("}\n\n")
-	#	fd.write("std::deque<Token" + self.getTypes() + " *>" + self.grammarName + "::innerLex(std::istream &istream)\n");
-	#	fd.write("{\n");
-	#	fd.write("\tstd::deque<Token" + self.getTypes() + " *> res;\n");
-
-	#	fd.write("\tstatic_cast<void>(istream);\n\n");
-	#	fd.write("\treturn (res);\n");
-	#	fd.write("}\n\n");
 		fd.write(self.grammarName + "::" + self.grammarName + "(" + self.grammarName + " const &instance) : AbstractGrammar" + self.getTypes() + "(instance)\n");
 		fd.write("{\n");
 		fd.write("\t*this = instance;\n");
@@ -347,7 +348,7 @@ class ParserGenerator:
 		fd.write("}\n");
 	
 	def generateMainSource(self):
-		fd = self.openFileString("srcs", "main", ".cpp");
+		fd = self.openFileString(self.generatedSourcesFolder, "main", ".cpp");
 		fd.write("\n");
 		fd.write("#include \"" + self.grammarName + ".hpp\"\n");
 		fd.write("#include \"LRParser.hpp\"\n");
@@ -391,7 +392,7 @@ class ParserGenerator:
 		fd.write("}\n");
 
 	def generateBasicSource(self, path, baseClassName, override):
-		fileFullPath = path + "/" + baseClassName + ".cpp";
+		fileFullPath = path + baseClassName + ".cpp";
 		if not os.path.exists(fileFullPath) and not override:
 			return;
 		fd = open(fileFullPath, "w");
@@ -414,7 +415,7 @@ class ParserGenerator:
 		fd.write("}\n");
 
 	def generateSources(self):
-		self.mkdir(sys.path[0] + "/../../" + "srcs");
+		self.mkdir(sys.path[0] + "/" + self.generatedSourcesFolder);
 		for oldIdentifier in self.grammar.terminals:
 			self.generateTerminalSource(self.grammar.terminals[oldIdentifier]);
 		for oldIdentifier in self.grammar.nonTerminals:
@@ -423,11 +424,11 @@ class ParserGenerator:
 		if (self.generateMain):
 			self.generateMainSource();
 		if self.contextFileBaseName != None:
-			self.generateBasicSource(sys.path[0] + "/../../srcs/", self.contextFileBaseName, True);
+			self.generateBasicSource(sys.path[0] + "/" + self.generatedSourcesFolder, self.contextFileBaseName, True);
 
 	def generateMakefile(self):
-		fd = open(sys.path[0] + "/../../Makefile", "w");
-		hw.writeHeaderStrings(fd, "Makefile", "#", "#");
+		fd = open(sys.path[0] + "/" + self.makefileFolder + "Makefile", "w");
+		hw.writeHeaderStrings(fd, self.makefileFolder + "Makefile", "#", "#");
 		fd.write("\n");
 		fd.write("NAME\t\t\t=\t" + self.programName + "\n");
 		fd.write("\n");
@@ -438,10 +439,10 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("DEBUG ?= 0\n");
 		fd.write("\n");
-		fd.write("SRCDIR\t\t\t=\tsrcs/\n");
+		fd.write("SRCDIR\t\t\t=\t" + self.generatedSourcesFolder + "\n");
 		fd.write("OBJDIR\t\t\t=\tobjs/\n");
 		fd.write("BINDIR\t\t\t=\t./\n");
-		fd.write("INCLUDESDIR\t\t=\tincludes/\n");
+		fd.write("INCLUDESDIR\t\t=\t" + self.generatedIncludesFolder + "\n");
 		fd.write("\n");
 		fd.write("INCLUDES\t\t=\t" + self.grammarName + ".hpp \\\n");
 
@@ -540,4 +541,4 @@ gen = ParserGenerator(path);
 gen.generateCode();
 # except Exception as e:
 # print(e);
-exit(1);
+exit(0);

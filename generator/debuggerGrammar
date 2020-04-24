@@ -5,10 +5,10 @@
 %prefix Symbol
 
 %returnType int
-%contextType CustomStack
+%contextType DebuggerContext
 %passContextBy reference
 
-%contextFileBaseName CustomStack
+%contextFileBaseName DebuggerContext
 %contextInstance context
 %generateMain true
 
