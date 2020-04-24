@@ -41,7 +41,7 @@ class AbstractStringTerminal : public AbstractTerminal<T, C>
 					return false;
 				i++;
 			}
-			return false;
+			return true;
 		}
 
 		virtual bool isEligibleForCurrent(std::string & current)
