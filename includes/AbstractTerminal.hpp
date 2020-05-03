@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:14:12 by ldedier           #+#    #+#             */
-/*   Updated: 2020/05/03 13:19:01 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/05/03 15:32:42 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ class AbstractTerminal : public AbstractSymbol<T, C>
 			return new Token<T, C>(*this);
 		}
 
-		t_priority getpriority(void)
+		t_priority getPriority(void)
 		{
 			return _priority;
 		}
