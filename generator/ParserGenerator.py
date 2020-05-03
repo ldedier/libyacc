@@ -29,6 +29,9 @@ class ParserGenerator:
 		self.generatedIncludesFolder = "../../includes/parser/";
 		self.generatedSourcesFolder = "../../srcs/parser/";
 
+		self.makefileRefSourcesFolder = "srcs/parser/"
+		self.makefileRefIncludesFolder = "includes/parser/"
+
 		self.returnType = "int";
 		self.contextType = None;
 		self.contextInstance = None;
@@ -432,17 +435,17 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("NAME\t\t\t=\t" + self.programName + "\n");
 		fd.write("\n");
-		fd.write("CC\t\t\t\t=\tg++ -std=c++11\n");
+		fd.write("CC\t\t\t\t=\tg++ -std=c++11 -O3\n");
 		fd.write("\n");
 		fd.write("ECHO\t\t\t=\techo\n");
 		fd.write("MKDIR\t\t\t=\tmkdir\n");
 		fd.write("\n");
 		fd.write("DEBUG ?= 0\n");
 		fd.write("\n");
-		fd.write("SRCDIR\t\t\t=\t" + self.generatedSourcesFolder + "\n");
+		fd.write("SRCDIR\t\t\t=\t" + self.makefileRefSourcesFolder + "\n");
 		fd.write("OBJDIR\t\t\t=\tobjs/\n");
 		fd.write("BINDIR\t\t\t=\t./\n");
-		fd.write("INCLUDESDIR\t\t=\t" + self.generatedIncludesFolder + "\n");
+		fd.write("INCLUDESDIR\t\t=\t" + self.makefileRefIncludesFolder + "\n");
 		fd.write("\n");
 		fd.write("INCLUDES\t\t=\t" + self.grammarName + ".hpp \\\n");
 
@@ -473,14 +476,14 @@ class ParserGenerator:
 		fd.write("\n");
 		fd.write("OBJECTS\t\t\t=\t$(addprefix $(OBJDIR), $(SRCS:.cpp=.o))");
 		fd.write("\n");
-		fd.write("CFLAGS\t\t\t=\t-I $(INCLUDESDIR) -Wall -Wextra -Werror -I ../includes -I libyacc/includes\n");
+		fd.write("CFLAGS\t\t\t=\t-I $(INCLUDESDIR) -Wall -Wextra -Werror -I libyacc/includes\n");
 		fd.write("\n");
 		fd.write("OK_COLOR\t\t\t=\t\\x1b[32;01m\n");
 		fd.write("EOC\t\t\t\t\t=\t\\033[0m\n");
 		fd.write("\n");
 		fd.write("ifeq ($(DEBUG), 1)\n");
 		fd.write("\tCFLAGS += -fsanitize=address\n");
-		fd.write("\t\CC += -g3\n");
+		fd.write("\tCC += -g3\n");
 		fd.write("endif\n");
 		fd.write("\n");
 		fd.write("all: $(NAME)\n");
@@ -495,7 +498,7 @@ class ParserGenerator:
 		fd.write("$(OBJDIR):\n");
 		fd.write("\t@$(MKDIR) $@\n");
 		fd.write("\n");
-		fd.write("$(OBJDIR)%.o: $(SRC_DIR)%.cpp $(INCLUDES)\n");
+		fd.write("$(OBJDIR)%.o: $(SRCDIR)%.cpp $(INCLUDES)\n");
 		fd.write("\t$(CC) -c $< -o $@ $(CFLAGS)\n");
 		fd.write("\n");
 		fd.write("clean:\n");

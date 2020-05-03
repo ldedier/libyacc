@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/03 00:47:40 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/04 23:58:28 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/04/30 22:57:22 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ typedef enum	e_tokenType
 	E_TOKEN_TYPE_LONG
 }				t_tokenType;
 
+
+
 union	u_tokenUnion
 {
 	char		c;
@@ -40,7 +42,9 @@ union	u_tokenUnion
 template<typename T, typename C>
 class Token
 {
+	
 	public:
+
 		Token(void)
 		{
 
@@ -174,6 +178,10 @@ std::ostream &operator<<(std::ostream &o, Token<T, C>  &instance)
 	else if (instance.getType() == E_TOKEN_TYPE_LONG)
 	{
 		o << instance.getLongValue();
+	}
+	else if (instance.getType() == E_TOKEN_TYPE_STRING)
+	{
+		o << instance.getStringValue();
 	}
 	o << ")" << YACC_EOC;
 

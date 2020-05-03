@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/01/25 14:23:25 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/05/02 16:44:11 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,6 +253,7 @@ class AbstractGrammar
 				changes |= addToFirstSetByProductionFromSymbol(nonTerminal, *it);
 				if (!(*it)->getFirstSet().hasEpsilon())
 					return (changes);
+				it++;
 			}
 			if (!nonTerminal.getFirstSet().hasEpsilon())
 			{
@@ -332,7 +333,7 @@ class AbstractGrammar
 					if ((c = istream.peek()) != EOF && ( c != '\n' || !stopAtNewline))
 					{
 						current += c;
-						if (!treatTerminalEligibility(current, &terminal))
+						if (!treatTerminalEligibility(current, &terminal, res))
 						{
 							if (terminal)
 							{
@@ -376,6 +377,8 @@ class AbstractGrammar
         	return (res);
 		}
 
+	protected:
+
 		Start<T, C>										* _startSymbol;
 		AbstractNonTerminal<T, C>						* _startGrammarSymbol;
 		EndOfInput<T, C>								* _endOfInput;
@@ -389,21 +392,24 @@ class AbstractGrammar
 
 		private:
 		
-			bool treatTerminalEligibility(std::string current, AbstractTerminal<T, C> **terminal)
+		bool treatTerminalEligibility(std::string current, AbstractTerminal<T, C> **terminal, std::deque<Token<T, C> *>	&tokens)
+		{
+			typename std::vector<AbstractTerminal<T, C> *>::iterator it = _tokens.begin();
+			bool res = false;
+
+			if (tokens.size() == 0 || 1)
 			{
-				typename std::vector<AbstractTerminal<T, C> *>::iterator it = _tokens.begin();
-				bool res = false;
 				while (it != _tokens.end())
 				{
-					// std::cout << *(*it) << std::endl;
 					if ((*it)->staysEligibleForCurrent(current))
 						res = true;
 					if ((*it)->isEligibleForCurrent(current))
 						*terminal = *it;
 					it++;
 				}
-				return res;
 			}
+			return res;
+		}
 };
 
 template<typename T, typename C>
