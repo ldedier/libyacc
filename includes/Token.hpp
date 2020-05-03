@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/03 00:47:40 by ldedier           #+#    #+#             */
-/*   Updated: 2020/04/30 22:57:22 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/05/03 21:28:22 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,40 @@ class Token
 
 		}
 
+		virtual std::ostream &repr(std::ostream &o) 
+		{
+			
+			if (getType() == E_TOKEN_TYPE_NONE)
+				return o;
+			o << YACC_YELLOW << " (";
+			if (getType() == E_TOKEN_TYPE_CHAR)
+			{
+				o << getCharValue();
+			}
+			else if (getType() == E_TOKEN_TYPE_DOUBLE)
+			{
+				o << getDoubleValue();
+			}
+			else if (getType() == E_TOKEN_TYPE_FLOAT)
+			{
+				o << getFloatValue();
+			}
+			else if (getType() == E_TOKEN_TYPE_INT)
+			{
+				o << getIntValue();
+			}
+			else if (getType() == E_TOKEN_TYPE_LONG)
+			{
+				o << getLongValue();
+			}
+			else if (getType() == E_TOKEN_TYPE_STRING)
+			{
+				o << getStringValue();
+			}
+			o << ")" << YACC_EOC;
+			return o;
+		}
+
 	private:
 		AbstractTerminal<T, C>		*_terminal;
 		u_tokenUnion				_tokenUnion;
@@ -152,39 +186,7 @@ template<typename T, typename C>
 std::ostream &operator<<(std::ostream &o, Token<T, C>  &instance)
 {
 	o << *(instance.getTerminal());
-
-	if (instance.getType() == E_TOKEN_TYPE_NONE)
-	{
-		return o;
-	}
-
-	o <<  YACC_YELLOW << " (";
-	if (instance.getType() == E_TOKEN_TYPE_CHAR)
-	{
-		o << instance.getCharValue();
-	}
-	else if (instance.getType() == E_TOKEN_TYPE_DOUBLE)
-	{
-		o << instance.getDoubleValue();
-	}
-	else if (instance.getType() == E_TOKEN_TYPE_FLOAT)
-	{
-		o << instance.getFloatValue();
-	}
-	else if (instance.getType() == E_TOKEN_TYPE_INT)
-	{
-		o << instance.getIntValue();
-	}
-	else if (instance.getType() == E_TOKEN_TYPE_LONG)
-	{
-		o << instance.getLongValue();
-	}
-	else if (instance.getType() == E_TOKEN_TYPE_STRING)
-	{
-		o << instance.getStringValue();
-	}
-	o << ")" << YACC_EOC;
-
+	instance.repr(o);
 	return o;
 }
 #endif

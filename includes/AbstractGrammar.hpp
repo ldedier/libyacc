@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/05/02 16:44:11 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/05/03 19:03:37 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -401,10 +401,13 @@ class AbstractGrammar
 			{
 				while (it != _tokens.end())
 				{
-					if ((*it)->staysEligibleForCurrent(current))
-						res = true;
-					if ((*it)->isEligibleForCurrent(current))
-						*terminal = *it;
+					if ((*it)->canBeAdded(tokens))
+					{
+						if ((*it)->staysEligibleForCurrent(current))
+							res = true;
+						if ((*it)->isEligibleForCurrent(current))
+							*terminal = *it;
+					}
 					it++;
 				}
 			}

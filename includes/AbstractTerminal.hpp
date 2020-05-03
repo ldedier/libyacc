@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:14:12 by ldedier           #+#    #+#             */
-/*   Updated: 2020/05/03 15:32:42 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/05/03 20:35:40 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,12 @@ class AbstractTerminal : public AbstractSymbol<T, C>
 			return this->_adjacent;
 		}
 
+		virtual bool canBeAdded(std::deque<Token<T, C> *> &tokens)
+		{
+			static_cast<void>(tokens);
+			return true;
+		}
+
 		virtual bool staysEligibleForCurrent(std::string & current)
 		{
 			return getLexerString().compare(0, current.size(), current) == 0;
@@ -118,6 +124,7 @@ class AbstractTerminal : public AbstractSymbol<T, C>
 			static_cast<void>(tokenContent);
 			static_cast<void>(tokens);
 
+			
 			if (isblank(delimiter) && (E_ADJACENT_DETACHED & _adjacent))
 				return true;
 			else if (!isblank(delimiter) && (E_ADJACENT_ADJACENT & _adjacent))
