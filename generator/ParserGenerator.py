@@ -477,12 +477,14 @@ class ParserGenerator:
 		fd.write("OBJECTS\t\t\t=\t$(addprefix $(OBJDIR), $(SRCS:.cpp=.o))");
 		fd.write("\n");
 		fd.write("CFLAGS\t\t\t=\t-I $(INCLUDESDIR) -Wall -Wextra -Werror -I libyacc/includes\n");
+		fd.write("LFLAGS\t\t\t=\t\"\"");
 		fd.write("\n");
 		fd.write("OK_COLOR\t\t\t=\t\\x1b[32;01m\n");
 		fd.write("EOC\t\t\t\t\t=\t\\033[0m\n");
 		fd.write("\n");
 		fd.write("ifeq ($(DEBUG), 1)\n");
 		fd.write("\tCFLAGS += -fsanitize=address\n");
+		fd.write("\tLFLAGS += -fsanitize=address\n");
 		fd.write("\tCC += -g3\n");
 		fd.write("endif\n");
 		fd.write("\n");
@@ -492,7 +494,7 @@ class ParserGenerator:
 		fd.write("\t@$(MAKE) all DEBUG=1\n");
 		fd.write("\n");
 		fd.write("$(BINDIR)$(NAME): $(OBJDIR) $(OBJECTS)\n");
-		fd.write("\t$(CC) -o $@ $(OBJECTS)\n");
+		fd.write("\t$(CC) -o $@ $(OBJECTS) $(LFLAGS)\n");
 		fd.write("\t@$(ECHO) \"$(OK_COLOR)$(NAME) linked with success ! $(EOC)\"\n");
 		fd.write("\n");
 		fd.write("$(OBJDIR):\n");
