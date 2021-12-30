@@ -1,4 +1,3 @@
-#!/usr/local/bin/python3
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
@@ -25,10 +24,8 @@ class Grammar:
 
 	@staticmethod
 	def smartSplit(line):
+		if (line.lstrip().startswith('#')): return []
 		return line.split();
-	#	split = line.rstrip().split(" ");
-	#	split = list(filter(None, split));
-	#	return split;
 
 	def __repr__(self):
 		res = "";
