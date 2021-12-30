@@ -45,10 +45,9 @@ class HeaderWriter:
 	@classmethod
 	def writeHeaderString(HeaderWriter, fd, name, string):
 		HeaderWriter.writeHeaderStrings(fd, name, string, string)
-	
 
 	@classmethod
-	def openFile(HeaderWriter, name):
+	def openFile(HeaderWriter, name, openComment="/*", closeComment='*/'):
 		fd = open(name, "w")
-		HeaderWriter.writeHeader(fd, name)
+		HeaderWriter.writeHeaderStrings(fd, name, openComment, closeComment)
 		return fd

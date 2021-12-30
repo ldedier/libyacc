@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:19:48 by ldedier           #+#    #+#             */
-/*   Updated: 2020/04/30 18:34:30 by ldedier          ###   ########.fr       */
+/*   Updated: 2020/08/15 14:08:07 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class LRParser
 			while (computeAllStates())
 				;
 			computeTables();
-			// this->debug();
+			//this->debug();
 		}
 
 		LRParser(LRParser const &instance)
@@ -391,6 +391,8 @@ class LRParser
 					if ((testReduce = dynamic_cast<LRActionReduce<T, C> *>(_tables[stateIndex][currentItem->getLookahead().getIndex()])))
 					{
 						std::cerr << "Reduce Reduce conflict" << std::endl;
+						std::cerr << *(testReduce->getProduction()) << std::endl;
+						std::cerr << currentItem->getProduction() << std::endl;
 					}
 					if ((testShift = dynamic_cast<LRActionShift<T, C> *>(_tables[stateIndex][currentItem->getLookahead().getIndex()])))
 					{
