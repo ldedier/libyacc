@@ -313,7 +313,6 @@ class LRParser
 					Set<T, C> set = Set<T, C>(*_cfg, ++it, item.getProduction().getSymbols(), item.getLookahead());
 					changes |= computeClosureFromNonTerminal(state, *nonTerminal, set);
 				}
-				it++;
 			}
 			item.setParsed(!changes);
 			return changes;
