@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2020/05/03 19:03:37 by ldedier          ###   ########.fr       */
+/*   Updated: 2022/01/12 19:25:22 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ template<typename T, typename C>
 class AbstractGrammar
 {
 	public:
-		
+
 		AbstractGrammar(void) {}
 
 		AbstractGrammar(AbstractNonTerminal <T, C> *startGrammarSymbol) : _startGrammarSymbol(startGrammarSymbol), _index(0),
@@ -52,7 +52,7 @@ class AbstractGrammar
 		{
 			*this = instance;
 		}
-	
+
 		AbstractGrammar<T, C> &operator=(AbstractGrammar<T, C> const &rhs)
 		{
 			static_cast<void>(rhs);
@@ -60,7 +60,7 @@ class AbstractGrammar
 		}
 
 		virtual ~AbstractGrammar(void)
-		{			
+		{
 			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _symbolsMap.begin();
 
 			while (it != _symbolsMap.end())
@@ -120,7 +120,7 @@ class AbstractGrammar
 		AbstractSymbol<T, C> *getSymbol(std::string identifier)
 		{
 			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _symbolsMap.find(identifier);
-			
+
 			if (it != _symbolsMap.end()) {
 				return it->second;
 			}
@@ -134,7 +134,7 @@ class AbstractGrammar
 		{
 			AbstractTerminal<T, C> *res;
 			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _symbolsMap.find(identifier);
-			
+
 			if (it != _symbolsMap.end())
 			{
 				if (!(res = dynamic_cast<AbstractTerminal<T,C> *>(it->second)))
@@ -159,7 +159,7 @@ class AbstractGrammar
 			res.push_back(new Token<T, C>(*(getTerminal("_EOI_"))));
 			return res;
 		}
-		
+
 		class LexicalErrorException : public std::exception
 		{
 			public:
@@ -206,7 +206,7 @@ class AbstractGrammar
 			_nonTerminals.push_back(nonTerminal);
 			addSymbol(nonTerminal);
 		}
-		
+
 		void addTerminal(AbstractTerminal<T, C> *terminal)
 		{
 			_tokens.push_back(terminal);
@@ -247,7 +247,7 @@ class AbstractGrammar
 		{
 			int changes = 0;
 			typename std::vector<AbstractSymbol<T, C> *>::const_iterator it = production->getSymbols().begin();
-			
+
 			while (it != production->getSymbols().end())
 			{
 				changes |= addToFirstSetByProductionFromSymbol(nonTerminal, *it);
@@ -279,7 +279,7 @@ class AbstractGrammar
 		{
 			int changes = 0;
 			typename std::vector<AbstractNonTerminal<T, C> * >::iterator it = _nonTerminals.begin();
-		
+
 			while (it != _nonTerminals.end())
 			{
 				changes |= addFirstSetIteration(*(*it));
@@ -291,7 +291,7 @@ class AbstractGrammar
 		void computeFirstSets(void)
 		{
 			typename std::map<std::string, AbstractSymbol<T, C> *>::iterator it = _symbolsMap.begin();
-			
+
 			while (it != _symbolsMap.end()) {
 				(it->second)->initFirstSet();
 				it++;
@@ -312,6 +312,14 @@ class AbstractGrammar
 			computeFirstSets();
 		}
 
+		bool markStartOfComment(std::string currentLex) {
+			return false;
+		}
+
+		bool markEndOfComment(std::string currentLex) {
+			return false;
+		}
+
 		virtual std::deque<Token<T, C> *> innerLex(bool stopAtNewline, std::istream & istream)
 		{
 			std::deque<Token<T, C> *>	res;
@@ -327,7 +335,7 @@ class AbstractGrammar
 				current.clear();
 				terminal = nullptr;
 				pos = 0;
-				endPos = 0;		
+				endPos = 0;
 				while (!istream.eof())
 				{
 					if ((c = istream.peek()) != EOF && ( c != '\n' || !stopAtNewline))
@@ -391,25 +399,22 @@ class AbstractGrammar
 		bool											_blankAsDelimiters;
 
 		private:
-		
+
 		bool treatTerminalEligibility(std::string current, AbstractTerminal<T, C> **terminal, std::deque<Token<T, C> *>	&tokens)
 		{
 			typename std::vector<AbstractTerminal<T, C> *>::iterator it = _tokens.begin();
 			bool res = false;
 
-			if (tokens.size() == 0 || 1)
+			while (it != _tokens.end())
 			{
-				while (it != _tokens.end())
+				if ((*it)->canBeAdded(tokens))
 				{
-					if ((*it)->canBeAdded(tokens))
-					{
-						if ((*it)->staysEligibleForCurrent(current))
-							res = true;
-						if ((*it)->isEligibleForCurrent(current))
-							*terminal = *it;
-					}
-					it++;
+					if ((*it)->staysEligibleForCurrent(current))
+						res = true;
+					if ((*it)->isEligibleForCurrent(current))
+						*terminal = *it;
 				}
+				it++;
 			}
 			return res;
 		}
@@ -440,5 +445,4 @@ void printTokenQueue(std::deque<Token<T, C> *> &tokens)
 	}
 }
 
-// std::ostream &operator<<(std::ostream &o, AbstractGrammar const &instance);
 #endif
