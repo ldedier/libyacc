@@ -16,47 +16,38 @@ from functools import reduce
 class Symbol:
 
 	@staticmethod
-	def identifyString(string):
-		tmp = string.lower();
-		return tmp;
-	
-	@staticmethod
 	def capitalizeCustom(string):
 		if (len(string) > 0):
-			res = string[0].upper() + string[1:];
+			res = string[0].upper() + string[1:]
 		else:
-			res = string[:];
-		return res;
+			res = string[:]
+		return res
 
 	def __init__(self, identifier, fileBaseName):
-		self.productions = [];
-		self.oldIdentifier = identifier;
-		self.identifier = identifier.lower();
-		self.fileBaseName = Symbol.capitalizeCustom(fileBaseName);
-		self.subClass = "AbstractTerminal";
+		self.productions = []
+		self.identifier = identifier
+		self.fileBaseName = Symbol.capitalizeCustom(fileBaseName)
+		self.subClass = "AbstractTerminal"
 
 	def addProduction(self, identifiers, grammar):
-		prod = [];
+		prod = []
 		if (identifiers != ["_EPS_"]):
 			for identifier in identifiers:
 				if (identifier in grammar.symbols):
-					symbol = grammar.symbols[identifier];
+					symbol = grammar.symbols[identifier]
 				else:
-					symbol = Symbol(identifier, identifier);
-					grammar.symbols[identifier] = symbol;
-					grammar.nonTerminals[identifier] = symbol;
-				prod.append(symbol);
-		self.productions.append(prod);
+					symbol = Symbol(identifier, identifier)
+					grammar.symbols[identifier] = symbol
+					grammar.nonTerminals[identifier] = symbol
+				prod.append(symbol)
+		self.productions.append(prod)
 
 	def __repr__(self):
-		res = self.identifier;
-		res += " ( " + self.fileBaseName + " )";
-	#	if len(self.productions) > 0 :
-		res += "\n"
+		res = self.identifier
+		res += " ( " + self.fileBaseName + " )\n"
 		for production in self.productions:
-			res += self.identifier + " => ";
+			res += self.identifier + " => "
 			for symbol in production:
-				res += symbol.oldIdentifier + " ";
+				res += symbol.identifier + " "
 			res += "\n"
-		return res;
-
+		return res

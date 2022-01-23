@@ -6,7 +6,7 @@
 #    By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/05 19:12:07 by ldedier           #+#    #+#              #
-#    Updated: 2020/01/07 15:54:34 by ldedier          ###   ########.fr        #
+#    Updated: 2022/01/21 08:09:15 by ldedier          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,11 +20,11 @@ class HeaderWriter:
 
 	@classmethod
 	def writeHeaderStrings(HeaderWriter, fd, name, start, end):
-		split = name.split("/");
-		name = split[len(split) - 1];
-		name = name[:40];
-		time = datetime.today().strftime('%Y/%m/%d %H:%M:%S') + " by " + HeaderWriter.login;
-		by = HeaderWriter.login + " <" + HeaderWriter.email + ">";
+		split = name.split("/")
+		name = split[len(split) - 1]
+		name = name[:40]
+		time = datetime.today().strftime('%Y/%m/%d %H:%M:%S') + " by " + HeaderWriter.login
+		by = HeaderWriter.login + " <" + HeaderWriter.email + ">"
 
 		fd.write(start + " " + ("*" * (2 - len(start))) + "**************************************************************************"+ ("*" *  (2 - len(end)))+ " "  + end + "\n")
 		fd.write(start + " " + (" " * (2 - len(start))) + "                                                                          " + (" " * (2 - len(end)))+ " " + end + "\n")

@@ -6,7 +6,7 @@
 /*   By: ldedier <ldedier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/28 07:09:59 by ldedier           #+#    #+#             */
-/*   Updated: 2022/01/12 19:25:22 by ldedier          ###   ########.fr       */
+/*   Updated: 2022/01/23 09:17:59 by ldedier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,11 +312,13 @@ class AbstractGrammar
 			computeFirstSets();
 		}
 
-		bool markStartOfComment(std::string currentLex) {
+		virtual bool markStartOfComment(std::string currentLex) {
+			static_cast<void>(currentLex);
 			return false;
 		}
 
-		bool markEndOfComment(std::string currentLex) {
+		virtual bool markEndOfComment(std::string currentLex) {
+			static_cast<void>(currentLex);
 			return false;
 		}
 
@@ -329,19 +331,29 @@ class AbstractGrammar
 			AbstractTerminal<T, C>		*terminal;
 			Token <T, C>				*token;
 			char						c;
+			bool						isToDiscard;
 
-			while (!istream.eof())
+			isToDiscard = false;
+			while (!istream.eof()) //loop on all tokens created
 			{
 				current.clear();
 				terminal = nullptr;
 				pos = 0;
 				endPos = 0;
-				while (!istream.eof())
+
+				while (!istream.eof()) //loop on all characters of current token
 				{
-					if ((c = istream.peek()) != EOF && ( c != '\n' || !stopAtNewline))
+					if ((c = istream.peek()) != EOF && (c != '\n' || !stopAtNewline)) //check if not end of parsing
 					{
 						current += c;
-						if (!treatTerminalEligibility(current, &terminal, res))
+						if (markStartOfComment(current))
+							isToDiscard = true;
+						else if (isToDiscard && markEndOfComment(current))
+						{
+							isToDiscard = false;
+							break;
+						}
+						if (!isToDiscard && !treatTerminalEligibility(current, &terminal, res)) // we have no eligible for current
 						{
 							if (terminal)
 							{
@@ -349,7 +361,7 @@ class AbstractGrammar
 								res.push_back(token);
 								break;
 							}
-							else if (isblank(c) && _blankAsDelimiters)
+							else if (isblank(c) && _blankAsDelimiters && current.size() == 1)
 							{
 								istream.get();
 								break;
@@ -366,7 +378,7 @@ class AbstractGrammar
 							istream.get();
 						}
 					}
-					else
+					else //end of parsing
 					{
 						if (terminal)
 						{

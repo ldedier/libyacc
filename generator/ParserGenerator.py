@@ -13,6 +13,7 @@
 
 import sys
 import os
+import argparse
 from os import path as osp
 from HeaderWriter import HeaderWriter as hw
 from Grammar import Grammar
@@ -41,6 +42,9 @@ class ParserGenerator:
 		self.generateMain = False
 		self.programName = "a.out"
 		self.blankAsDelimiter = True
+		self.stopAtNewLine = False
+		self.grammar = Grammar()
+		self.grammar.blankAsDelimiter = self.blankAsDelimiter
 		self.parse(fd)
 		if self.passContextBy == "reference":
 			self.contextSuffix = " &"
@@ -48,8 +52,7 @@ class ParserGenerator:
 			self.contextSuffix = " *"
 		else:
 			self.contextSuffix = ""
-		self.grammar = Grammar(fd)
-		self.grammar.blankAsDelimiter = self.blankAsDelimiter
+
 		print(self)
 
 	def parse(self, fd):
@@ -101,11 +104,24 @@ class ParserGenerator:
 						self.blankAsDelimiter = False
 					else:
 						raise Exception(split[1] + ": not a valid boolean")
+				elif split[0] == "%stopAtNewLine":
+					if (split[1].lower() == "true"):
+						self.stopAtNewLine = True
+					elif (split[1].lower() == "false"):
+						self.stopAtNewLine = False
+					else:
+						raise Exception(split[1] + ": not a valid boolean")
 				elif (len(split[0]) and split[0][0] != '#'):
 					raise Exception(split[0] + ": invalid option")
 			elif len(split) == 1:
-				if split[0] == "%tokens":
-					break
+				if split[0] == "%%tokens":
+					self.grammar.parseTokensFromFd(fd)
+				elif split[0] == "%%nonterminals":
+					self.grammar.parseNonTerminalsFromFd(fd)
+				elif split[0] == "%%markStartOfComment":
+					self.grammar.parseMarkStartOfCommentFromFd(fd)
+				elif split[0] == "%%markEndOfComment":
+					self.grammar.parseMarkEndOfCommentFromFd(fd)
 
 	@staticmethod
 	def openFile(folder, name, extension):
@@ -162,12 +178,11 @@ class ParserGenerator:
 		fd = ParserGenerator.openFileHeader(self.generatedIncludesFolder, self.getFullBaseName(terminal), ".hpp")
 		className = self.getFullBaseName(terminal)
 		fd.write("\n")
-	#	fd.write("# include <iostream>\n")
 		fd.write("# include "+"\"" + terminal.subClass + ".hpp\"\n")
 		if (self.contextFileBaseName != None):
 			fd.write("# include \"" + self.contextFileBaseName + ".hpp\"\n")
 		fd.write("\n")
-		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContextTypeWithSuffix() + ">\n");
+		fd.write("class " + className + " : public "+ terminal.subClass + "<" + self.returnType + ", " + self.getContextTypeWithSuffix() + ">\n")
 		fd.write("{\n")
 		fd.write("\tpublic:\n")
 		fd.write("\t\t" + className + "(void);\n")
@@ -184,7 +199,6 @@ class ParserGenerator:
 		fd = ParserGenerator.openFileHeader(self.generatedIncludesFolder, self.getFullBaseName(nonTerminal), ".hpp")
 		className = self.getFullBaseName(nonTerminal)
 		fd.write("\n")
-	#	fd.write("# include <iostream>\n")
 		fd.write("# include \""+ self.grammarName + ".hpp" + "\"\n")
 		fd.write("\n")
 		fd.write("class " + className + " : public AbstractNonTerminal"+  self.getTypes() + "\n")
@@ -207,11 +221,11 @@ class ParserGenerator:
 		fd.write("\n")
 		if (self.contextFileBaseName != None):
 			fd.write("#include \"" + self.contextFileBaseName + ".hpp\"\n")
-		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("#include \"" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".hpp\"\n")
+		for identifier in self.grammar.nonTerminals:
+			fd.write("#include \"" + self.getFullBaseName(self.grammar.nonTerminals[identifier]) + ".hpp\"\n")
 		fd.write("\n")
-		for oldIdentifier in self.grammar.terminals:
-			fd.write("#include \"" + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + ".hpp\"\n")
+		for identifier in self.grammar.terminals:
+			fd.write("#include \"" + self.getFullBaseName(self.grammar.terminals[identifier]) + ".hpp\"\n")
 		fd.write("\n")
 		fd.write("class " + self.grammarName + " : public AbstractGrammar" + self.getTypes() + "\n")
 		fd.write("{\n")
@@ -220,7 +234,10 @@ class ParserGenerator:
 		fd.write("\t\t" + self.grammarName + "(" + self.grammarName + " const &instance);\n")
 		fd.write("\t\t" + self.grammarName + " &operator=(" + self.grammarName + " const &rhs);\n")
 		fd.write("\t\tvirtual ~" + self.grammarName + "(void);\n")
-		#fd.write("\t\tvirtual std::deque<Token" + self.getTypes() + " *> innerLex(std::istream &istream);\n")
+		if self.grammar.markStartOfComment != None:
+			fd.write("\t\tvirtual bool markStartOfComment(std::string currentLex);\n")
+		if self.grammar.markEndOfComment != None:
+			fd.write("\t\tvirtual bool markEndOfComment(std::string currentLex);\n")
 		fd.write("\n")
 		fd.write("\tprivate:")
 		fd.write("\n")
@@ -247,10 +264,10 @@ class ParserGenerator:
 
 	def generateIncludes(self):
 		self.mkdir(sys.path[0] + "/" + self.generatedIncludesFolder)
-		for oldIdentifier in self.grammar.terminals:
-			self.generateTerminalInclude(self.grammar.terminals[oldIdentifier])
-		for oldIdentifier in self.grammar.nonTerminals:
-			self.generateNonTerminalInclude(self.grammar.nonTerminals[oldIdentifier])
+		for identifier in self.grammar.terminals:
+			self.generateTerminalInclude(self.grammar.terminals[identifier])
+		for identifier in self.grammar.nonTerminals:
+			self.generateNonTerminalInclude(self.grammar.nonTerminals[identifier])
 		self.generateGrammarInclude()
 		if self.contextFileBaseName != None:
 			ParserGenerator.generateBasicInclude(self.generatedIncludesFolder, self.contextFileBaseName)
@@ -298,7 +315,10 @@ class ParserGenerator:
 				fd.write("\"" + symbol.identifier + "\"")
 				if len(prod) - 1 != i:
 					fd.write(", ")
-			fd.write("});\n")
+			if len(prod) > 0 and prod[0].identifier == nonTerminal.identifier:
+				fd.write("}, true);\n") # automatize AST node replacing process on recursive productions
+			else:
+				fd.write("});\n")
 		fd.write("}\n")
 
 	def generateGrammarSource(self):
@@ -311,12 +331,12 @@ class ParserGenerator:
 		fd.write(self.grammarName + "::" + self.grammarName + "(void) : AbstractGrammar(new " + \
 		self.getFullBaseName(self.grammar.startSymbol) + "(), " + ("true" if self.grammar.blankAsDelimiter else "false")+ ")\n")
 		fd.write("{\n")
-		for oldIdentifier in self.grammar.nonTerminals:
-			if (oldIdentifier != self.grammar.startSymbol.oldIdentifier):
-				fd.write("\taddNonTerminal(new " + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + "());\n")
+		for identifier in self.grammar.nonTerminals:
+			if (identifier != self.grammar.startSymbol.identifier):
+				fd.write("\taddNonTerminal(new " + self.getFullBaseName(self.grammar.nonTerminals[identifier]) + "());\n")
 		fd.write("\n")
-		for oldIdentifier in self.grammar.terminals:
-			fd.write("\taddTerminal(new " + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + "());\n")
+		for identifier in self.grammar.terminals:
+			fd.write("\taddTerminal(new " + self.getFullBaseName(self.grammar.terminals[identifier]) + "());\n")
 		fd.write("\n")
 		fd.write("\tcomputeGrammar();\n")
 		fd.write("}\n\n")
@@ -331,6 +351,18 @@ class ParserGenerator:
 		fd.write("\tstatic_cast<void>(rhs);\n")
 		fd.write("\treturn *this;\n")
 		fd.write("}\n")
+		if self.grammar.markStartOfComment != None:
+			fd.write("\n")
+			fd.write("bool " + self.grammarName + "::markStartOfComment(std::string currentLex)\n")
+			fd.write("{\n")
+			fd.write(self.grammar.markStartOfComment)
+			fd.write("}\n")
+		if self.grammar.markEndOfComment != None:
+			fd.write("\n")
+			fd.write("bool " + self.grammarName + "::markEndOfComment(std::string currentLex)\n")
+			fd.write("{\n")
+			fd.write(self.grammar.markEndOfComment)
+			fd.write("}\n")
 
 	def generateMainSource(self):
 		fd = ParserGenerator.openFile(self.generatedSourcesFolder, "main", ".cpp")
@@ -349,7 +381,7 @@ class ParserGenerator:
 		fd.write("\tgrammar.debug(false);\n")
 		fd.write("\ttry\n")
 		fd.write("\t{\n")
-		fd.write("\t\ttokens = grammar.lex(true, std::cin);\n")
+		fd.write("\t\ttokens = grammar.lex(" + ("true" if self.stopAtNewLine else "false") +", std::cin);\n")
 		fd.write("\t\tprintTokenQueue(tokens);\n")
 		fd.write("\t\tASTBuilder" + self.getTypes() + "*b = parser.parse(tokens);\n")
 		if (self.passContextBy == "copy"):
@@ -400,10 +432,10 @@ class ParserGenerator:
 
 	def generateSources(self):
 		self.mkdir(sys.path[0] + "/" + self.generatedSourcesFolder)
-		for oldIdentifier in self.grammar.terminals:
-			self.generateTerminalSource(self.grammar.terminals[oldIdentifier])
-		for oldIdentifier in self.grammar.nonTerminals:
-			self.generateNonTerminalSource(self.grammar.nonTerminals[oldIdentifier])
+		for identifier in self.grammar.terminals:
+			self.generateTerminalSource(self.grammar.terminals[identifier])
+		for identifier in self.grammar.nonTerminals:
+			self.generateNonTerminalSource(self.grammar.nonTerminals[identifier])
 		self.generateGrammarSource()
 		if (self.generateMain):
 			self.generateMainSource()
@@ -430,10 +462,10 @@ class ParserGenerator:
 		fd.write("\n")
 		fd.write("INCLUDES\t\t=\t" + self.grammarName + ".hpp \\\n")
 
-		for oldIdentifier in self.grammar.terminals:
-			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + ".hpp \\\n")
-		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".hpp \\\n")
+		for identifier in self.grammar.terminals:
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.terminals[identifier]) + ".hpp \\\n")
+		for identifier in self.grammar.nonTerminals:
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[identifier]) + ".hpp \\\n")
 		if (self.contextFileBaseName != None):
 			fd.write("\t\t\t\t\t" + self.contextFileBaseName + ".hpp \\\n")
 
@@ -441,10 +473,10 @@ class ParserGenerator:
 		fd.write("\n")
 		fd.write("SRCS\t\t\t=\t" + self.grammarName + ".cpp \\\n")
 
-		for oldIdentifier in self.grammar.terminals:
-			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.terminals[oldIdentifier]) + ".cpp \\\n")
-		for oldIdentifier in self.grammar.nonTerminals:
-			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[oldIdentifier]) + ".cpp \\\n")
+		for identifier in self.grammar.terminals:
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.terminals[identifier]) + ".cpp \\\n")
+		for identifier in self.grammar.nonTerminals:
+			fd.write("\t\t\t\t\t" + self.getFullBaseName(self.grammar.nonTerminals[identifier]) + ".cpp \\\n")
 		if self.generateMain:
 			fd.write("\t\t\t\t\t" + "main.cpp \\\n")
 		if (self.contextFileBaseName != None):
@@ -516,13 +548,13 @@ class ParserGenerator:
 			res += "contextFileBaseName: None\n"
 		return res
 
-if len(sys.argv) >= 2:
-	path = sys.argv[1]
-else:
-	sys.exit("you shall add the path of your grammar")
-# try:
-gen = ParserGenerator(path)
-gen.generateCode()
-# except Exception as e:
-# print(e)
-exit(0)
+
+if __name__ == '__main__':
+	argParser = argparse.ArgumentParser('generate a c++ parser skeleton from a config file')
+	argParser.add_argument('confPath', help="path of the config file", type=str)
+	args = argParser.parse_args()
+
+	exit 0
+	gen = ParserGenerator(args.confPath)
+	gen.generateCode()
+	exit(0)
