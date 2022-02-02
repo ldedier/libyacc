@@ -11,17 +11,18 @@
 #                                                                              #
 # **************************************************************************** #
 
+from ast import arg
 import sys
 import os
 import argparse
 from os import path as osp
 from HeaderWriter import HeaderWriter as hw
 from Grammar import Grammar
+from Confirm import confirm
 
 class ParserGenerator:
 
-	def __init__(self, path):
-		fd = open(path, "r")
+	def __init__(self, configPath, override, files):
 		self.prefix = ""
 		self.nonTerminalPrefix = ""
 		self.terminalPrefix = ""
@@ -45,14 +46,15 @@ class ParserGenerator:
 		self.stopAtNewLine = False
 		self.grammar = Grammar()
 		self.grammar.blankAsDelimiter = self.blankAsDelimiter
-		self.parse(fd)
+		self.parse(open(configPath, "r"))
 		if self.passContextBy == "reference":
 			self.contextSuffix = " &"
 		elif (self.passContextBy == "pointer"):
 			self.contextSuffix = " *"
 		else:
 			self.contextSuffix = ""
-
+		self.override = override
+		self.files = files
 		print(self)
 
 	def parse(self, fd):
@@ -123,14 +125,34 @@ class ParserGenerator:
 				elif split[0] == "%%markEndOfComment":
 					self.grammar.parseMarkEndOfCommentFromFd(fd)
 
-	@staticmethod
-	def openFile(folder, name, extension):
-		fd = hw.openFile(osp.join(folder, name) + extension)
+	def checkFileCreation(self, folder, name, extension=''):
+		## override
+		# confirm: replace if confirmation
+		# noconfirm: replace without having to confirm
+		# no-override: do not replace ever
+		## files
+		# if empty: all files
+
+		basename = name + extension
+		filename = osp.join(folder, name) + extension
+
+		if self.files and basename not in self.files:
+			return False
+		existFilename = osp.exists(filename)
+		if self.override == 'confirm' and existFilename and not confirm(f'override {filename} ?'):
+			return False
+		elif self.override == 'noOverride' and existFilename:
+			if self.files and basename in self.files:
+				print(f'did not generate {filename} because it already exist (use -f option to force overriding files)')
+			return False
+		return True
+
+	def openFile(self, folder, name, extension=''):
+		fd = hw.openFile(osp.join(folder, name + extension))
 		return fd
 
-	@staticmethod
-	def openFileHeader(folder, name, extension):
-		fd = ParserGenerator.openFile(folder, name, extension)
+	def openFileHeader(self, folder, name, extension):
+		fd = self.openFile(folder, name, extension)
 		fd.write("\n")
 		define = name.upper() + "_HPP"
 		fd.write("#ifndef " + define + "\n")
@@ -175,7 +197,9 @@ class ParserGenerator:
 		return self.prefix + pref + symbol.fileBaseName
 
 	def generateTerminalInclude(self, terminal):
-		fd = ParserGenerator.openFileHeader(self.generatedIncludesFolder, self.getFullBaseName(terminal), ".hpp")
+		openFileHeaderArgs=(self.generatedIncludesFolder, self.getFullBaseName(terminal), ".hpp")
+		if not self.checkFileCreation(*openFileHeaderArgs): return
+		fd = self.openFileHeader(*openFileHeaderArgs)
 		className = self.getFullBaseName(terminal)
 		fd.write("\n")
 		fd.write("# include "+"\"" + terminal.subClass + ".hpp\"\n")
@@ -196,7 +220,9 @@ class ParserGenerator:
 		fd.write("#endif\n")
 
 	def generateNonTerminalInclude(self, nonTerminal):
-		fd = ParserGenerator.openFileHeader(self.generatedIncludesFolder, self.getFullBaseName(nonTerminal), ".hpp")
+		openFileHeaderArgs=(self.generatedIncludesFolder, self.getFullBaseName(nonTerminal), ".hpp")
+		if not self.checkFileCreation(*openFileHeaderArgs): return
+		fd = self.openFileHeader(*openFileHeaderArgs)
 		className = self.getFullBaseName(nonTerminal)
 		fd.write("\n")
 		fd.write("# include \""+ self.grammarName + ".hpp" + "\"\n")
@@ -216,7 +242,9 @@ class ParserGenerator:
 		fd.write("#endif\n")
 
 	def generateGrammarInclude(self):
-		fd = ParserGenerator.openFileHeader(self.generatedIncludesFolder, self.grammarName, ".hpp")
+		openFileHeaderArgs=(self.generatedIncludesFolder, self.grammarName, ".hpp")
+		if not self.checkFileCreation(*openFileHeaderArgs): return
+		fd = self.openFileHeader(*openFileHeaderArgs)
 		fd.write("#include \"AbstractGrammar.hpp\"\n")
 		fd.write("\n")
 		if (self.contextFileBaseName != None):
@@ -246,9 +274,10 @@ class ParserGenerator:
 		fd.write("\n")
 		fd.write("#endif\n")
 
-	@staticmethod
-	def generateBasicInclude(path, baseClassName):
-		fd = ParserGenerator.openFileHeader(path, baseClassName, ".hpp")
+	def generateBasicInclude(self, path, baseClassName):
+		openFileHeaderArgs=(path, baseClassName, ".hpp")
+		if not self.checkFileCreation(*openFileHeaderArgs): return
+		fd = self.openFileHeader(*openFileHeaderArgs)
 		fd.write("\n")
 		fd.write("class " + baseClassName + "\n")
 		fd.write("{\n")
@@ -270,10 +299,12 @@ class ParserGenerator:
 			self.generateNonTerminalInclude(self.grammar.nonTerminals[identifier])
 		self.generateGrammarInclude()
 		if self.contextFileBaseName != None:
-			ParserGenerator.generateBasicInclude(self.generatedIncludesFolder, self.contextFileBaseName)
+			self.generateBasicInclude(self.generatedIncludesFolder, self.contextFileBaseName)
 
 	def generateTerminalSource(self, terminal):
-		fd = ParserGenerator.openFile(self.generatedSourcesFolder, self.getFullBaseName(terminal), ".cpp")
+		openFileArgs=(self.generatedSourcesFolder, self.getFullBaseName(terminal), ".cpp")
+		if not self.checkFileCreation(*openFileArgs): return
+		fd = self.openFile(*openFileArgs)
 		className = self.getFullBaseName(terminal)
 		fd.write("\n")
 		fd.write("# include \"" + className + ".hpp" + "\"\n")
@@ -291,7 +322,9 @@ class ParserGenerator:
 		fd.write("\n")
 
 	def generateNonTerminalSource(self, nonTerminal):
-		fd = ParserGenerator.openFile(self.generatedSourcesFolder, self.getFullBaseName(nonTerminal), ".cpp")
+		openFileArgs=(self.generatedSourcesFolder, self.getFullBaseName(nonTerminal), ".cpp")
+		if not self.checkFileCreation(*openFileArgs): return
+		fd = self.openFile(*openFileArgs)
 		className = self.getFullBaseName(nonTerminal)
 		fd.write("\n")
 		fd.write("# include \""+ className + ".hpp" + "\"\n")
@@ -322,7 +355,9 @@ class ParserGenerator:
 		fd.write("}\n")
 
 	def generateGrammarSource(self):
-		fd = ParserGenerator.openFile(self.generatedSourcesFolder, self.grammarName, ".cpp")
+		openFileArgs=(self.generatedSourcesFolder, self.grammarName, ".cpp")
+		if not self.checkFileCreation(*openFileArgs): return
+		fd = self.openFile(*openFileArgs)
 		fd.write("\n")
 		fd.write("#include \"" + self.grammarName + ".hpp\"\n")
 		if (self.contextFileBaseName != None):
@@ -365,7 +400,9 @@ class ParserGenerator:
 			fd.write("}\n")
 
 	def generateMainSource(self):
-		fd = ParserGenerator.openFile(self.generatedSourcesFolder, "main", ".cpp")
+		openFileArgs=(self.generatedSourcesFolder, "main", ".cpp")
+		if not self.checkFileCreation(*openFileArgs): return
+		fd = self.openFile(*openFileArgs)
 		fd.write("\n")
 		fd.write("#include \"" + self.grammarName + ".hpp\"\n")
 		fd.write("#include \"LRParser.hpp\"\n")
@@ -408,11 +445,10 @@ class ParserGenerator:
 		fd.write("\treturn (0);\n")
 		fd.write("}\n")
 
-	@staticmethod
-	def generateBasicSource(path, baseClassName):
-		fileFullPath = osp.join(path,baseClassName + ".cpp")
-		fd = open(fileFullPath, "w")
-		hw.writeHeader(fd, fileFullPath)
+	def generateBasicSource(self, path, baseClassName):
+		openFileArgs=(path, baseClassName, ".cpp")
+		if not self.checkFileCreation(*openFileArgs): return
+		fd = self.openFile(*openFileArgs)
 		fd.write("\n")
 		fd.write("#include \"" + baseClassName + ".hpp\"\n")
 		fd.write("\n")
@@ -440,10 +476,10 @@ class ParserGenerator:
 		if (self.generateMain):
 			self.generateMainSource()
 		if self.contextFileBaseName != None:
-			ParserGenerator.generateBasicSource(self.generatedSourcesFolder, self.contextFileBaseName)
+			self.generateBasicSource(self.generatedSourcesFolder, self.contextFileBaseName)
 
 	def generateMakefile(self):
-		#fd = open(osp.join(self.makefileFolder,"Makefile"), "w")
+		if not self.checkFileCreation(self.makefileFolder, "Makefile"): return
 		fd = hw.openFile(osp.join(self.makefileFolder, "Makefile"), "#", "#")
 		fd.write("\n")
 		fd.write("NAME\t\t\t=\t" + self.programName + "\n")
@@ -506,7 +542,7 @@ class ParserGenerator:
 		fd.write("\n")
 		fd.write("$(BINDIR)$(NAME): $(OBJDIR) $(OBJECTS)\n")
 		fd.write("\t$(CC) -o $@ $(OBJECTS) $(LFLAGS)\n")
-		fd.write("\t@$(ECHO) \"$(OK_COLOR)$(NAME) linked with success ! $(EOC)\"\n")
+		fd.write("\t@$(ECHgO) \"$(OK_COLOR)$(NAME) linked with success ! $(EOC)\"\n")
 		fd.write("\n")
 		fd.write("$(OBJDIR):\n")
 		fd.write("\t@$(MKDIR) $@\n")
@@ -524,7 +560,6 @@ class ParserGenerator:
 		fd.write("\n")
 		fd.write(".PHONY: all clean fclean re debug\n")
 		print("generated Makefile !")
-
 
 	def generateCode(self):
 		self.generateIncludes()
@@ -548,13 +583,22 @@ class ParserGenerator:
 			res += "contextFileBaseName: None\n"
 		return res
 
+class NamebaseAction(argparse.Action):
+	def __init__(self, option_strings, dest, **kwargs):
+		super().__init__(option_strings, dest, '+', **kwargs)
+	def __call__(self, parser, namespace, values, option_string=None):
+		setattr(namespace, self.dest, [osp.basename(val) for val in values])
 
 if __name__ == '__main__':
 	argParser = argparse.ArgumentParser('generate a c++ parser skeleton from a config file')
 	argParser.add_argument('confPath', help="path of the config file", type=str)
-	args = argParser.parse_args()
+	argParser.add_argument('-f'                , dest='override', action='store_const', help="override without confirmation"   , const='noConfirm', default='noOverride')
+	argParser.add_argument('--override-confirm', dest='override', action='store_const', help="override files with confirmation", const='confirm'  , default='noOverride')
+	argParser.add_argument('--files', metavar='file', action=NamebaseAction, help="files to generate")
 
-	exit 0
-	gen = ParserGenerator(args.confPath)
+	args = argParser.parse_args()
+	if not args.files and args.override == 'noConfirm' and not confirm("You are about to override all of the files already generated, continue ?"):
+		exit(0)
+	gen = ParserGenerator(args.confPath, args.override, args.files)
 	gen.generateCode()
 	exit(0)
